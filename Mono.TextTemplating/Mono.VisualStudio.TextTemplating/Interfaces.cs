@@ -84,8 +84,8 @@ namespace Mono.VisualStudio.TextTemplating
 
 	public interface IProcessTransformationRunFactory
 	{
+		bool IsAlive { get; set; }
 		IProcessTransformationRun CreateTransformationRun (Type runnerType, ParsedTemplate pt, ResolveEventHandler resolver);
-
 		string RunTransformation (IProcessTransformationRun transformationRun);
 	}
 

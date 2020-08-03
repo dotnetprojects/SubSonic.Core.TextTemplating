@@ -9,6 +9,11 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 	{
 		public const string TransformationRunFactoryPrefix = "TransformationRunFactoryService";
 		public const string TransformationRunFactorySuffix = nameof (TransformationRunFactory);
+
+		/// <summary>
+		/// get the status of this instance.
+		/// </summary>
+		public bool IsAlive { get; set; }
 		/// <summary>
 		/// Create the transformation runner
 		/// </summary>
