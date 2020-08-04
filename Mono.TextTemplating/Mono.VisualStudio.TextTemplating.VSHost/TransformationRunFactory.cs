@@ -7,8 +7,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		: MarshalByRefObject
 		, IProcessTransformationRunFactory
 	{
-		public const string TransformationRunFactoryPrefix = "TransformationRunFactoryService";
-		public const string TransformationRunFactorySuffix = nameof (TransformationRunFactory);
+		public const string TransformationRunFactoryService = "TransformationRunFactoryService";
+		public const string TransformationRunFactoryMethod = "TransformationRunFactory";
 
 		/// <summary>
 		/// get the status of this instance.
@@ -32,6 +32,5 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		{
 			return null;
 		}
-
 	}
 }
