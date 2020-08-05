@@ -37,6 +37,7 @@ using Mono.TextTemplating.CodeCompilation;
 
 namespace Mono.TextTemplating
 {
+	[Serializable]
 	public class TemplateSettings
 	{
 		public TemplateSettings ()

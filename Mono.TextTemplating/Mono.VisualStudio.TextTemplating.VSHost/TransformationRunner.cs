@@ -7,6 +7,7 @@ using Mono.TextTemplating;
 
 namespace Mono.VisualStudio.TextTemplating.VSHost
 {
+	[Serializable]
 	public class TransformationRunner
 		: MarshalByRefObject
 		, IProcessTransformationRun
@@ -193,6 +194,9 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		protected Assembly AttemptAssemblyLoad(AssemblyName assembly)
 		{
+			if (assembly == null) {
+				throw new ArgumentNullException (nameof (assembly));
+			}
 			try {
 				return Assembly.LoadFrom (assembly.CodeBase);
 			}

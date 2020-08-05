@@ -33,6 +33,7 @@ using System.Collections.Generic;
 
 namespace Mono.TextTemplating
 {
+	[Serializable]
 	public sealed class CompiledTemplate :
 #if FEATURE_APPDOMAINS
 		MarshalByRefObject,

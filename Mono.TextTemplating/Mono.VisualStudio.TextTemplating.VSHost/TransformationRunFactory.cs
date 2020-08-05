@@ -2,7 +2,8 @@ using System;
 using Mono.TextTemplating;
 
 namespace Mono.VisualStudio.TextTemplating.VSHost
-{
+{ 
+	[Serializable]
 	public abstract class TransformationRunFactory
 		: MarshalByRefObject
 		, IProcessTransformationRunFactory
