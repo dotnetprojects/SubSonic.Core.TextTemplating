@@ -6,7 +6,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 {
 	public interface ITransformationRunFactoryService
 	{
-		IProcessTransformationRunFactory GetTransformationRunFactory (Guid ID);
+		IProcessTransformationRunFactory GetTransformationRunFactory (string guidID);
 		/// <summary>
 		/// Let the service now it can shutdown
 		/// </summary>

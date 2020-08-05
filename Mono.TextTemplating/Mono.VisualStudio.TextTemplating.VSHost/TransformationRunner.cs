@@ -191,17 +191,6 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			return compiledTemplate;
 		}
 
-		//public virtual void PreLoadAssemblies (IEnumerable<string> assemblies)
-		//{
-		//	try {
-		//		//TODO:: investigate preloading assemblies with the AssemblyLoadContext
-		//	}catch(Exception ex) {
-		//		if (TemplatingEngine.IsCriticalException (ex)) {
-		//			throw;
-		//		}
-		//	}
-		//}
-
 		protected Assembly AttemptAssemblyLoad(AssemblyName assembly)
 		{
 			try {
