@@ -9,8 +9,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 {
 	[Serializable]
 	public class TransformationRunner
-		: MarshalByRefObject
-		, IProcessTransformationRun
+		: IProcessTransformationRun
 	{
 		CompiledTemplate compiledTemplate;
 		TemplateSettings settings;

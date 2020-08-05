@@ -5,8 +5,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 { 
 	[Serializable]
 	public abstract class TransformationRunFactory
-		: MarshalByRefObject
-		, IProcessTransformationRunFactory
+		: IProcessTransformationRunFactory
 	{
 		public const string TransformationRunFactoryService = "TransformationRunFactoryService";
 		public const string TransformationRunFactoryMethod = "TransformationRunFactory";
@@ -28,10 +27,5 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		public abstract IProcessTransformationRun CreateTransformationRun (Type runnerType, ParsedTemplate pt, ResolveEventHandler resolver);
 
 		public abstract string RunTransformation (IProcessTransformationRun transformationRun);
-
-		public override object InitializeLifetimeService ()
-		{
-			return null;
-		}
 	}
 }
