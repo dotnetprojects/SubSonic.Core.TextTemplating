@@ -8,7 +8,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		: IProcessTransformationRunFactory
 	{
 		public const string TransformationRunFactoryService = "TransformationRunFactoryService";
-		public const string TransformationRunFactoryMethod = "TransformationRunFactory";
+		public const string TransformationRunFactoryMethod = nameof(TransformationRunFactory);
 
 		/// <summary>
 		/// get the status of this instance.
