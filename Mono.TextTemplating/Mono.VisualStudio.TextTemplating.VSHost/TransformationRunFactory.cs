@@ -8,7 +8,7 @@ using Mono.TextTemplating;
 namespace Mono.VisualStudio.TextTemplating.VSHost
 {
 	[Serializable]
-	public abstract class TransformationRunFactory
+	public class TransformationRunFactory
 		: IProcessTransformationRunFactory
 	{
 #if !NET35
