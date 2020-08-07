@@ -29,6 +29,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		{
 			this.factory = factory ?? throw new ArgumentNullException (nameof (factory)); // this tags the runner with the run factory
 			this.id = id;
+			this.Errors = new CompilerErrorCollection();
 		}
 
 		public Guid RunnerId { get => id; }
