@@ -13,7 +13,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 	{
 #if !NET35
 		[NonSerialized]
-		readonly ConcurrentDictionary<Guid, IProcessTransformationRunner> runners = new ConcurrentDictionary<Guid, IProcessTransformationRunner> ();
+		readonly static ConcurrentDictionary<Guid, IProcessTransformationRunner> runners = new ConcurrentDictionary<Guid, IProcessTransformationRunner> ();
 #endif
 		[NonSerialized]
 		readonly IProcessTextTemplatingEngine engine;
@@ -31,9 +31,6 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			this.id = id;
 
 			engine = new TemplatingEngine ();
-#if !NET35
-			runners = new ConcurrentDictionary<Guid, IProcessTransformationRunner> ();
-#endif
 		}
 
 
