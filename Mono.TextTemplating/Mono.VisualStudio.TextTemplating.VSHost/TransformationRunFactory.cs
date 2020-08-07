@@ -26,7 +26,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		protected readonly Guid id;
 #pragma warning restore CA1051 // Do not declare visible instance fields
 		
-		protected TransformationRunFactory (Guid id)
+		public TransformationRunFactory (Guid id)
 		{
 			this.id = id;
 
