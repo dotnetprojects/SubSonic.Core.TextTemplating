@@ -9,13 +9,37 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 {
 	[Serializable]
 	public class TransformationRunner
-		: IProcessTransformationRun
+		: IProcessTransformationRunner
 	{
+		readonly Guid id;
 		CompiledTemplate compiledTemplate;
 		TemplateSettings settings;
 		ITextTemplatingEngineHost host;
 
 		public CompilerErrorCollection Errors { get; private set; }
+
+		public TransformationRunner(Guid id)
+		{
+			this.id = id;	// this tags the runner with the id of the run factory
+		}
+
+		Assembly ResolveReferencedAssemblies (object sender, ResolveEventArgs args)
+		{
+			AssemblyName asmName = new AssemblyName (args.Name);
+			foreach (var asmFile in compiledTemplate.AssemblyFiles) {
+				if (asmName.Name == System.IO.Path.GetFileNameWithoutExtension (asmFile)) {
+					return Assembly.LoadFrom (asmFile);
+				}
+			}
+
+			var path = host.ResolveAssemblyReference (asmName.Name + ".dll");
+
+			if (System.IO.File.Exists (path)) {
+				return Assembly.LoadFrom (path);
+			}
+
+			return null;
+		}
 
 		public virtual string PerformTransformation ()
 		{
@@ -32,7 +56,9 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			try {
 				transform = CreateTextTransformation (settings, host, compiledTemplate.Assembly);
 
-				return compiledTemplate.Process (transform);
+				compiledTemplate.SetTextTemplatingEngineHost (host);
+
+				return compiledTemplate.Process (transform, new ResolveEventHandler(ResolveReferencedAssemblies));
 			}
 			catch (Exception ex) {
 				if (TemplatingEngine.IsCriticalException(ex)) {
@@ -147,7 +173,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			try {
 				this.settings.Assemblies.Add (base.GetType ().Assembly.Location);
 				this.settings.Assemblies.Add (typeof (ITextTemplatingEngineHost).Assembly.Location);
-				this.compiledTemplate = LocateAssembly (pt, content);
+				compiledTemplate = LocateAssembly (pt, content);
 			}
 			catch(Exception ex) {
 				if (TemplatingEngine.IsCriticalException (ex)) {
@@ -155,7 +181,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 				}
 				LogError (string.Format (CultureInfo.CurrentCulture, VsTemplatingErrorResources.Exception, ex), false);
 			}
-			return this.compiledTemplate != null;
+			return compiledTemplate != null;
 		}
 
 		CompiledTemplate LocateAssembly (ParsedTemplate pt, string content)

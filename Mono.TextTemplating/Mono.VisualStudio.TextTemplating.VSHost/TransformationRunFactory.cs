@@ -10,6 +10,15 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		public const string TransformationRunFactoryService = "TransformationRunFactoryService";
 		public const string TransformationRunFactoryMethod = nameof(TransformationRunFactory);
 
+#pragma warning disable CA1051 // Do not declare visible instance fields
+		protected readonly Guid id;
+#pragma warning restore CA1051 // Do not declare visible instance fields
+
+		protected TransformationRunFactory (Guid id)
+		{
+			this.id = id;
+		}
+
 		/// <summary>
 		/// get the status of this instance.
 		/// </summary>
@@ -18,14 +27,19 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		/// Create the transformation runner
 		/// </summary>
 		/// <param name="runnerType"></param>
-		/// <param name="pt"></param>
-		/// <param name="resolver"></param>
 		/// <returns></returns>
-		/// <remarks>
-		/// abstracted, just because I am uncertain on how this would run on multiple platforms. Also visual studio classes may be required to pull of correctly.
-		/// </remarks>
-		public abstract IProcessTransformationRun CreateTransformationRun (Type runnerType, ParsedTemplate pt, ResolveEventHandler resolver);
-
-		public abstract string RunTransformation (IProcessTransformationRun transformationRun);
+		public IProcessTransformationRunner CreateTransformationRunner (Type runnerType)
+		{
+			if (Activator.CreateInstance(runnerType, new object[] { id }) is IProcessTransformationRunner runner) {
+				return runner;
+			}
+			return default;
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="runner"></param>
+		/// <returns></returns>
+		public abstract string StartTransformation (IProcessTransformationRunner runner);
 	}
 }

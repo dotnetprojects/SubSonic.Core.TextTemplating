@@ -30,6 +30,7 @@ using Mono.VisualStudio.TextTemplating;
 using System.CodeDom.Compiler;
 using System.Globalization;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 
 namespace Mono.TextTemplating
 {
@@ -40,18 +41,21 @@ namespace Mono.TextTemplating
 #endif
 		IDisposable
 	{
-		ITextTemplatingEngineHost host;
+		Type transformType;
 		object textTransformation;
 		readonly CultureInfo culture;
-		readonly string [] assemblyFiles;
+		ITextTemplatingEngineHost host;
 
-		public CompiledTemplate (ITextTemplatingEngineHost host, CompilerResults results, string fullName, CultureInfo culture,
-			string [] assemblyFiles)
+		public CompiledTemplate (CompilerResults results, string fullName, ITextTemplatingEngineHost host, CultureInfo culture, string [] assemblyFiles)
 		{
-			AppDomain.CurrentDomain.AssemblyResolve += ResolveReferencedAssemblies;
-			this.host = host;
-			this.culture = culture;
-			this.assemblyFiles = assemblyFiles;
+			if (results == null) {
+				throw new ArgumentNullException (nameof (results));
+			}
+
+			this.culture = culture ?? throw new ArgumentNullException (nameof (culture));
+			AssemblyFiles = assemblyFiles ?? throw new ArgumentNullException (nameof (assemblyFiles));
+
+			SetTextTemplatingEngineHost (host);
 			Load (results, fullName);
 		}
 
@@ -59,98 +63,130 @@ namespace Mono.TextTemplating
 		/// Get the compiled assembly
 		/// </summary>
 		public Assembly Assembly { get; private set; }
+		/// <summary>
+		/// get a list of required assemblies
+		/// </summary>
+		public IEnumerable<string> AssemblyFiles { get; private set; }
 
 		void Load (CompilerResults results, string fullName)
 		{
+			AppDomain.CurrentDomain.AssemblyResolve += ResolveReferencedAssemblies;
+
 			//results.CompiledAssembly doesn't work on .NET core, it throws a cryptic internal error
 			//use Assembly.LoadFile instead
 			//for debugging we need the assembly
-			Assembly = System.Reflection.Assembly.LoadFile (results.PathToAssembly);
+			Assembly = Assembly.LoadFile (results.PathToAssembly);
 
-			Type transformType = Assembly.GetType (fullName);
+			transformType = Assembly.GetType (fullName);
 			//MS Templating Engine does not look on the type itself, 
 			//it checks only that required methods are exists in the compiled type 
 			textTransformation = Activator.CreateInstance (transformType);
 
-			//set the host property if it exists
 			Type hostType = null;
-			var gen = host as TemplateGenerator;
-			if (gen != null) {
+
+			if (host is TemplateGenerator gen) {
 				hostType = gen.SpecificHostType;
 			}
-			var hostProp = transformType.GetProperty ("Host", hostType ?? typeof (ITextTemplatingEngineHost));
-			if (hostProp != null && hostProp.CanWrite)
-				hostProp.SetValue (textTransformation, host, null);
 
-			var sessionHost = host as ITextTemplatingSessionHost;
-			if (sessionHost != null) {
+			var hostProp = transformType.GetProperty ("Host", hostType ?? typeof (ITextTemplatingEngineHost));
+
+			if (hostProp != null && hostProp.CanWrite) {
+				hostProp.SetValue (textTransformation, host, null);
+			}
+
+			if (host is ITextTemplatingSessionHost sessionHost) {
 				//FIXME: should we create a session if it's null?
 				var sessionProp = transformType.GetProperty ("Session", typeof (IDictionary<string, object>));
 				sessionProp.SetValue (textTransformation, sessionHost.Session, null);
 			}
 		}
 
+		public void SetTextTemplatingEngineHost(ITextTemplatingEngineHost host)
+		{
+			this.host = host ?? throw new ArgumentNullException (nameof (host));
+		}
 
 		public string Process()
 		{
 			return Process (textTransformation);
 		}
 
-		public string Process (object textTransformation)
+		public string Process (object textTransformation, ResolveEventHandler resolveEventHandler = null)
 		{
-			var ttType = textTransformation.GetType ();
-
-			var errorProp = ttType.GetProperty ("Errors", BindingFlags.Instance | BindingFlags.NonPublic);
-			if (errorProp == null)
-				throw new ArgumentException ("Template must have 'Errors' property");
-			var errorMethod = ttType.GetMethod ("Error", new Type [] { typeof (string) });
-			if (errorMethod == null) {
-				throw new ArgumentException ("Template must have 'Error(string message)' method");
+			if (textTransformation == null) {
+				throw new ArgumentNullException (nameof (textTransformation));
 			}
 
-			var errors = (CompilerErrorCollection)errorProp.GetValue (textTransformation, null);
-			errors.Clear ();
+			if (resolveEventHandler != null) {
+				AppDomain.CurrentDomain.AssemblyResolve += resolveEventHandler;
+			}
 
-			//set the culture
-			if (culture != null)
-				ToStringHelper.FormatProvider = culture;
-			else
-				ToStringHelper.FormatProvider = CultureInfo.InvariantCulture;
+			try {
+				var ttType = textTransformation.GetType ();
 
-			string output = null;
-
-			var initMethod = ttType.GetMethod ("Initialize");
-			var transformMethod = ttType.GetMethod ("TransformText");
-
-			if (initMethod == null) {
-				errorMethod.Invoke (textTransformation, new object [] { "Error running transform: no method Initialize()" });
-			} else if (transformMethod == null) {
-				errorMethod.Invoke (textTransformation, new object [] { "Error running transform: no method TransformText()" });
-			} else try {
-					initMethod.Invoke (textTransformation, null);
-					output = (string)transformMethod.Invoke (textTransformation, null);
-				} catch (Exception ex) {
-					errorMethod.Invoke (textTransformation, new object [] { "Error running transform: " + ex });
+				var errorProp = ttType.GetProperty ("Errors", BindingFlags.Instance | BindingFlags.NonPublic);
+				if (errorProp == null) {
+					throw new ArgumentException ("Template must have 'Errors' property");
+				}
+				var errorMethod = ttType.GetMethod ("Error", new Type[] { typeof (string) });
+				if (errorMethod == null) {
+					throw new ArgumentException ("Template must have 'Error(string message)' method");
 				}
 
-			host.LogErrors (errors);
+				var errors = (CompilerErrorCollection)errorProp.GetValue (textTransformation, null);
+				errors.Clear ();
 
-			ToStringHelper.FormatProvider = CultureInfo.InvariantCulture;
-			return output;
+				//set the culture
+				if (culture != null) {
+					ToStringHelper.FormatProvider = culture;
+				} else {
+					ToStringHelper.FormatProvider = CultureInfo.InvariantCulture;
+				}
+
+				string output = null;
+
+				var initMethod = ttType.GetMethod ("Initialize");
+				var transformMethod = ttType.GetMethod ("TransformText");
+
+				if (initMethod == null) {
+					errorMethod.Invoke (textTransformation, new object[] { "Error running transform: no method Initialize()" });
+				} else if (transformMethod == null) {
+					errorMethod.Invoke (textTransformation, new object[] { "Error running transform: no method TransformText()" });
+				} else {
+					try {
+						initMethod.Invoke (textTransformation, null);
+						output = (string)transformMethod.Invoke (textTransformation, null);
+					}
+					catch (Exception ex) {
+						errorMethod.Invoke (textTransformation, new object[] { "Error running transform: " + ex });
+					}
+				}
+
+				host.LogErrors (errors);
+
+				ToStringHelper.FormatProvider = CultureInfo.InvariantCulture;
+
+				return output;
+			}
+			finally {
+			 	AppDomain.CurrentDomain.AssemblyResolve -= resolveEventHandler ?? ResolveReferencedAssemblies;
+			}
 		}
-
 
 		Assembly ResolveReferencedAssemblies (object sender, ResolveEventArgs args)
 		{
 			AssemblyName asmName = new AssemblyName (args.Name);
-			foreach (var asmFile in assemblyFiles) {
-				if (asmName.Name == System.IO.Path.GetFileNameWithoutExtension (asmFile))
+			foreach (var asmFile in AssemblyFiles) {
+				if (asmName.Name == System.IO.Path.GetFileNameWithoutExtension (asmFile)) {
 					return Assembly.LoadFrom (asmFile);
+				}
 			}
 
 			var path = host.ResolveAssemblyReference (asmName.Name + ".dll");
-			if (System.IO.File.Exists (path))
+
+			if (System.IO.File.Exists (path)) {
 				return Assembly.LoadFrom (path);
+			}
 
 			return null;
 		}
@@ -159,7 +195,6 @@ namespace Mono.TextTemplating
 		{
 			if (host != null) {
 				host = null;
-				AppDomain.CurrentDomain.AssemblyResolve -= ResolveReferencedAssemblies;
 			}
 		}
 	}

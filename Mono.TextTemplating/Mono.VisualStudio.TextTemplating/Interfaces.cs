@@ -75,26 +75,55 @@ namespace Mono.VisualStudio.TextTemplating
 		string ProcessTemplate (string inputFile, string content, ITextTemplatingCallback callback = null, object hierarchy = null);
 	}
 
-	public interface IProcessTransformationRun
+	public interface IProcessTransformationRunner
 	{
+		/// <summary>
+		/// start the transformation on compiled assembly through remote procedure call
+		/// </summary>
+		/// <returns></returns>
 		string PerformTransformation ();
-
+		/// <summary>
+		/// prepare the transformation by sending the arguments through a remote procedure call
+		/// </summary>
+		/// <param name="pt"><see cref="ParsedTemplate" /></param>
+		/// <param name="content">content of the prepared T4 template</param>
+		/// <param name="host"><see cref="ITextTemplatingEngineHost" /> transfer the host information with session.</param>
+		/// <param name="settings"><see cref="TemplateSettings"/> template settings provide information about the run.</param>
+		/// <returns></returns>
+		bool PrepareTransformation (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings);
+		/// <summary>
+		/// Get the errors, if anything prevented a successful run.
+		/// </summary>
 		CompilerErrorCollection Errors { get; }
 	}
 
 	public interface IProcessTransformationRunFactory
 	{
+		/// <summary>
+		/// Run Factory is alive and ready
+		/// </summary>
 		bool IsAlive { get; }
-		IProcessTransformationRun CreateTransformationRun (Type runnerType, ParsedTemplate pt, ResolveEventHandler resolver);
-		string RunTransformation (IProcessTransformationRun transformationRun);
+		/// <summary>
+		/// instanciate 
+		/// </summary>
+		/// <param name="runnerType"></param>
+		/// <returns></returns>
+		IProcessTransformationRunner CreateTransformationRunner (Type runnerType);
+		/// <summary>
+		/// Start the transformation from a template to a code file
+		/// </summary>
+		/// <param name="runner"></param>
+		/// <returns></returns>
+		string StartTransformation (IProcessTransformationRunner runner);
 	}
 
 	public interface IProcessTextTemplatingEngine
 		: ITextTemplatingEngine
 	{
-		IProcessTransformationRun PrepareTransformationRun (string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, bool debugging = false);
+		IProcessTransformationRunner PrepareTransformationRunner (string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, bool debugging = false);
 
 		CompiledTemplate CompileTemplate (string content, ITextTemplatingEngineHost host);
+
 		CompiledTemplate CompileTemplate (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings = null);
 	}
 

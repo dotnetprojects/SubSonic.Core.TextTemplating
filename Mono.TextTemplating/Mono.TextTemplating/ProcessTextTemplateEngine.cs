@@ -13,7 +13,7 @@ namespace Mono.TextTemplating
 	public partial class TemplatingEngine
 		: IProcessTextTemplatingEngine
 	{
-		public IProcessTransformationRun PrepareTransformationRun (string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, bool debugging = false)
+		public IProcessTransformationRunner PrepareTransformationRunner (string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, bool debugging = false)
 		{
 			if (content == null) {
 				throw new ArgumentNullException (nameof(content));
@@ -33,7 +33,7 @@ namespace Mono.TextTemplating
 
 			ParsedTemplate pt = ParsedTemplate.FromText (content, host);
 
-			IProcessTransformationRun run = null;
+			IProcessTransformationRunner run = null;
 
 			try {
 				if (pt.Errors.HasErrors) {
@@ -57,7 +57,7 @@ namespace Mono.TextTemplating
 			return run;
 		}
 
-		protected virtual IProcessTransformationRun CompileAndPrepareRun (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, TemplateSettings settings) 
+		protected virtual IProcessTransformationRunner CompileAndPrepareRun (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, TemplateSettings settings) 
 		{
 			TransformationRunner runner = null;
 			bool success = false;
@@ -78,26 +78,9 @@ namespace Mono.TextTemplating
 				throw new ArgumentNullException (nameof (settings));
 			}
 
-			Assembly ResolveReferencedAssemblies (object sender, ResolveEventArgs args)
-			{
-				AssemblyName asmName = new AssemblyName (args.Name);
-				foreach (var asmFile in settings.Assemblies) {
-					if (asmName.Name == Path.GetFileNameWithoutExtension (asmFile))
-						return Assembly.LoadFrom (asmFile);
-				}
-
-				var path = host.ResolveAssemblyReference (asmName.Name);
-
-				if (File.Exists (path)) {
-					return Assembly.LoadFrom (path);
-				}
-
-				return null;
-			}
-
 			try {
 				try {
-					if (runFactory.CreateTransformationRun (typeof (TransformationRunner), pt, new ResolveEventHandler(ResolveReferencedAssemblies)) is TransformationRunner theRunner) {
+					if (runFactory.CreateTransformationRunner (typeof (TransformationRunner)) is TransformationRunner theRunner) {
 						runner = theRunner;
 					}
 				}
@@ -115,7 +98,7 @@ namespace Mono.TextTemplating
 							success = runner.PrepareTransformation (pt, content, settings.HostSpecific ? host : null, settings);
 						}
 						catch (SerializationException) {
-							pt.LogError (VsTemplatingErrorResources.SessionHostMarshalError, new Location (host.TemplateFile, -1, -1));
+							pt.LogError (VsTemplatingErrorResources.SessionHostMarshalError, new Location (host.TemplateFile));
 							throw;
 						}
 					}
