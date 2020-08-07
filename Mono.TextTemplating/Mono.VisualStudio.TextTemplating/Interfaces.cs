@@ -95,6 +95,7 @@ namespace Mono.VisualStudio.TextTemplating
 		/// Get the errors, if anything prevented a successful run.
 		/// </summary>
 		CompilerErrorCollection Errors { get; }
+		Guid RunnerId { get; }
 	}
 
 	public interface IProcessTransformationRunFactory
@@ -104,17 +105,24 @@ namespace Mono.VisualStudio.TextTemplating
 		/// </summary>
 		bool IsAlive { get; }
 		/// <summary>
-		/// instanciate 
+		/// instanciate process runner
 		/// </summary>
-		/// <param name="runnerType"></param>
+		/// <param name="runnerType">type of runner to instanciate</param>
 		/// <returns></returns>
 		IProcessTransformationRunner CreateTransformationRunner (Type runnerType);
 		/// <summary>
+		/// We have no further need for the runner.
+		/// </summary>
+		/// <param name="runnerId">the runner id</param>
+		/// <returns>true, if successful</returns>
+		bool DisposeOfRunner (Guid runnerId);
+
+		/// <summary>
 		/// Start the transformation from a template to a code file
 		/// </summary>
-		/// <param name="runner"></param>
-		/// <returns></returns>
-		string StartTransformation (IProcessTransformationRunner runner);
+		/// <param name="runnerId">the runner id</param>
+		/// <returns>result of transformation run.</returns>
+		string PerformTransformation (Guid runnerId);
 	}
 
 	public interface IProcessTextTemplatingEngine
@@ -179,10 +187,12 @@ namespace Mono.VisualStudio.TextTemplating
 		string TemplateFile { get; }
 	}
 
+#pragma warning disable CA1710 // Identifiers should have correct suffix
 	public interface ITextTemplatingSession :
-		IEquatable<ITextTemplatingSession>, IEquatable<Guid>, IDictionary<string, Object>,
-		ICollection<KeyValuePair<string, Object>>,
-		IEnumerable<KeyValuePair<string, Object>>,
+#pragma warning restore CA1710 // Identifiers should have correct suffix
+		IEquatable<ITextTemplatingSession>, IEquatable<Guid>, IDictionary<string, object>,
+		ICollection<KeyValuePair<string, object>>,
+		IEnumerable<KeyValuePair<string, object>>,
 		IEnumerable, ISerializable
 	{
 		Guid Id { get; }
@@ -192,7 +202,9 @@ namespace Mono.VisualStudio.TextTemplating
 		: ISerializable
 	{
 		ITextTemplatingSession CreateSession ();
+#pragma warning disable CA2227 // Collection properties should be read only
 		ITextTemplatingSession Session { get; set; }
+#pragma warning restore CA2227 // Collection properties should be read only
 	}
 
 	public interface IDirectiveProcessor

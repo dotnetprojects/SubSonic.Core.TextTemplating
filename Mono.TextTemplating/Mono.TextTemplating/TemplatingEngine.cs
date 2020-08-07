@@ -393,15 +393,15 @@ namespace Mono.TextTemplating
 							settings.HostSpecific = string.Compare (val, "true", StringComparison.OrdinalIgnoreCase) == 0;
 						}
 					}
-					val = dt.Extract (nameof (TemplateSettings.CompilerOptions)) ?? host.GetHostOption(nameof(TemplateSettings.CompilerOptions))?.ToString().ToLower();
+					val = dt.Extract (nameof (TemplateSettings.CompilerOptions)) ?? host.GetHostOption(nameof(TemplateSettings.CompilerOptions))?.ToString().ToLower(CultureInfo.InvariantCulture);
 					if (val != null) {
 						settings.CompilerOptions = val;
 					}
-					val = dt.Extract ("relativeLinePragmas") ?? host.GetHostOption (nameof (TemplateSettings.UseRelativeLinePragmas))?.ToString().ToLower();
+					val = dt.Extract ("relativeLinePragmas") ?? host.GetHostOption (nameof (TemplateSettings.UseRelativeLinePragmas))?.ToString().ToLower(CultureInfo.InvariantCulture);
 					if (val != null) {
 						relativeLinePragmas = string.Compare (val, "true", StringComparison.OrdinalIgnoreCase) == 0;
 					}
-					val = dt.Extract ("linePragmas") ?? host.GetHostOption (nameof (TemplateSettings.NoLinePragmas))?.ToString ().ToLower ();
+					val = dt.Extract ("linePragmas") ?? host.GetHostOption (nameof (TemplateSettings.NoLinePragmas))?.ToString ().ToLower (CultureInfo.InvariantCulture);
 					if (val != null) {
 						settings.NoLinePragmas = string.Compare (val, "false", StringComparison.OrdinalIgnoreCase) == 0;
 					}
@@ -478,10 +478,10 @@ namespace Mono.TextTemplating
 			}
 
 			foreach (var kv in settings.DirectiveProcessors) {
-				((IDirectiveProcessor)kv.Value).SetProcessingRunIsHostSpecific (settings.HostSpecific);
-				var hs = kv.Value as IRecognizeHostSpecific;
-				if (hs != null)
+				kv.Value.SetProcessingRunIsHostSpecific (settings.HostSpecific);
+				if (kv.Value is IRecognizeHostSpecific hs) {
 					hs.SetProcessingRunIsHostSpecific (settings.HostSpecific);
+				}
 			}
 
 			if (settings.Name == null)
@@ -490,13 +490,14 @@ namespace Mono.TextTemplating
 				settings.Namespace = string.Format (CultureInfo.InvariantCulture, typeof (TextTransformation).Namespace + "{0:x}", new Random ().Next ());
 
 			//resolve the CodeDOM provider
-			if (String.IsNullOrEmpty (settings.Language)) {
+			if (string.IsNullOrEmpty (settings.Language)) {
 				settings.Language = "C#";
 			}
 
 			if (settings.Language == "C#v3.5") {
-				var providerOptions = new Dictionary<string, string> ();
-				providerOptions.Add ("CompilerVersion", "v3.5");
+				var providerOptions = new Dictionary<string, string> {
+					{ "CompilerVersion", "v3.5" }
+				};
 				settings.Provider = new CSharpCodeProvider (providerOptions);
 			}
 			else {

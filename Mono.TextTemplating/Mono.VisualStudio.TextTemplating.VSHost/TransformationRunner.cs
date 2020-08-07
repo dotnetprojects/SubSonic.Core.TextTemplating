@@ -3,26 +3,63 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+#if NETSTANDARD
+using System.Runtime.Loader;
+#endif
 using Mono.TextTemplating;
 
 namespace Mono.VisualStudio.TextTemplating.VSHost
 {
 	[Serializable]
-	public class TransformationRunner
+	public abstract class TransformationRunner
 		: IProcessTransformationRunner
 	{
+		[NonSerialized]
+		internal readonly TransformationRunFactory factory;
+		
 		readonly Guid id;
+
 		CompiledTemplate compiledTemplate;
 		TemplateSettings settings;
 		ITextTemplatingEngineHost host;
 
 		public CompilerErrorCollection Errors { get; private set; }
 
-		public TransformationRunner(Guid id)
+		public TransformationRunner(TransformationRunFactory factory, Guid id)
 		{
-			this.id = id;	// this tags the runner with the id of the run factory
+			this.factory = factory ?? throw new ArgumentNullException (nameof (factory)); // this tags the runner with the run factory
+			this.id = id;
 		}
 
+		public Guid RunnerId { get => id; }
+
+#if NETSTANDARD
+		protected abstract AssemblyLoadContext GetLoadContext ();
+
+		protected static AssemblyLoadContext GetLoadContext(Assembly assembly)
+		{
+			return AssemblyLoadContext.GetLoadContext (assembly);
+		}
+
+		protected abstract void Unload (AssemblyLoadContext context);
+
+		Assembly ResolveReferencedAssemblies (AssemblyLoadContext context, AssemblyName assemblyName)
+		{
+			foreach (string assemblyPath in compiledTemplate.AssemblyFiles) {
+				if (assemblyName.Name == System.IO.Path.GetFileNameWithoutExtension (assemblyPath)) {
+					return context.LoadFromAssemblyPath (assemblyPath);
+				}
+			}
+
+			string filePath = host.ResolveAssemblyReference ($"{assemblyName.Name}.dll");
+
+			if (System.IO.File.Exists (filePath)) {
+				return context.LoadFromAssemblyPath (filePath);
+			}
+
+			return null;
+		}
+#else
 		Assembly ResolveReferencedAssemblies (object sender, ResolveEventArgs args)
 		{
 			AssemblyName asmName = new AssemblyName (args.Name);
@@ -40,6 +77,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 			return null;
 		}
+#endif
 
 		public virtual string PerformTransformation ()
 		{
@@ -54,19 +92,50 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			object transform = null;
 
 			try {
-				transform = CreateTextTransformation (settings, host, compiledTemplate.Assembly);
+#if NETSTANDARD
+				if (GetLoadContext () is AssemblyLoadContext context) {
+					context.Resolving += ResolveReferencedAssemblies;
 
-				compiledTemplate.SetTextTemplatingEngineHost (host);
+					if (compiledTemplate.Load (context)) {
+						transform = CreateTextTransformation (settings, host, compiledTemplate.Assembly);
 
-				return compiledTemplate.Process (transform, new ResolveEventHandler(ResolveReferencedAssemblies));
+						compiledTemplate.SetTextTemplatingEngineHost (host);
+
+						return compiledTemplate.Process (transform);
+					}
+				}
+#else
+				AppDomain.CurrentDomain.AssemblyResolve += ResolveReferencedAssemblies;
+
+				if (compiledTemplate.Load ()) {
+					transform = CreateTextTransformation (settings, host, compiledTemplate.Assembly);
+
+					compiledTemplate.SetTextTemplatingEngineHost (host);
+
+					return compiledTemplate.Process (transform);
+				}
+#endif
+
+
 			}
 			catch (Exception ex) {
-				if (TemplatingEngine.IsCriticalException(ex)) {
+				if (TemplatingEngine.IsCriticalException (ex)) {
 					throw;
 				}
 				LogError (ex.ToString (), false);
 			}
 			finally {
+
+#if NETSTANDARD
+				if (GetLoadContext (compiledTemplate.Assembly) is AssemblyLoadContext context) {
+					context.Resolving -= ResolveReferencedAssemblies;
+
+					Unload (context);
+				}
+#else
+				AppDomain.CurrentDomain.AssemblyResolve -= ResolveReferencedAssemblies;
+#endif
+
 				if (transform is IDisposable disposable) {
 					disposable.Dispose ();
 				}
@@ -202,16 +271,11 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		CompiledTemplate Compile (ParsedTemplate pt, string content)
 		{
-			CompiledTemplate compiledTemplate = null;
+			CompiledTemplate compiledTemplate = factory.Engine.CompileTemplate (pt, content, host, settings);
 
-			if (host is ITextTemplatingComponents Component &&
-				Component.Engine is IProcessTextTemplatingEngine engine) {
-				compiledTemplate = engine.CompileTemplate (pt, content, host, settings);
-
-				if (settings.CachedTemplates) {
-					// we will resolve loading of assemblies through the run factory for cached templates
-					compiledTemplate?.Dispose ();
-				}
+			if (settings.CachedTemplates) {
+				// we will resolve loading of assemblies through the run factory for cached templates
+				compiledTemplate?.Dispose ();
 			}
 
 			return compiledTemplate;
@@ -226,6 +290,9 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 				return Assembly.LoadFrom (assembly.CodeBase);
 			}
 			catch(Exception ex) {
+				if (TemplatingEngine.IsCriticalException(ex)) {
+					throw;
+				}
 				LogError (string.Format (CultureInfo.CurrentCulture, VsTemplatingErrorResources.AssemblyLoadError, assembly.Name, ex), false);
 				return null;
 			}

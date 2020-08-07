@@ -158,5 +158,14 @@ namespace Mono.TextTemplating {
                 return ResourceManager.GetString("SessionHostSessionNotInitialized", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transformation runner, {0}, does not exist. use {1} create a runner..
+        /// </summary>
+        internal static string TransformationRunnerDoesNotExists {
+            get {
+                return ResourceManager.GetString("TransformationRunnerDoesNotExists", resourceCulture);
+            }
+        }
     }
 }

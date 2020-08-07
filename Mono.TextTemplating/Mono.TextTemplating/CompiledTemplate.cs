@@ -25,12 +25,14 @@
 // THE SOFTWARE.
 
 using System;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using Mono.VisualStudio.TextTemplating;
-using System.CodeDom.Compiler;
-using System.Globalization;
-using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
+#if NETSTANDARD
+using System.Runtime.Loader;
+#endif
 
 namespace Mono.TextTemplating
 {
@@ -52,30 +54,84 @@ namespace Mono.TextTemplating
 				throw new ArgumentNullException (nameof (results));
 			}
 
-			this.culture = culture ?? throw new ArgumentNullException (nameof (culture));
+			this.culture = culture ?? CultureInfo.CurrentCulture;
 			AssemblyFiles = assemblyFiles ?? throw new ArgumentNullException (nameof (assemblyFiles));
 
 			SetTextTemplatingEngineHost (host);
 			Load (results, fullName);
 		}
 
+#if FEATURE_APPDOMAINS
+		static AppDomain CurrentDomain => AppDomain.CurrentDomain;
+#endif
+
 		/// <summary>
 		/// Get the compiled assembly
 		/// </summary>
 		public Assembly Assembly { get; private set; }
+
+		public AssemblyName AssemblyName { get; private set; }
 		/// <summary>
 		/// get a list of required assemblies
 		/// </summary>
 		public IEnumerable<string> AssemblyFiles { get; private set; }
 
-		void Load (CompilerResults results, string fullName)
+#if NETSTANDARD
+		public bool Load (AssemblyLoadContext context)
 		{
-			AppDomain.CurrentDomain.AssemblyResolve += ResolveReferencedAssemblies;
+			bool success = false;
 
+			if (context == null) {
+				throw new ArgumentNullException (nameof (context));
+			}
+
+			try {
+				if (AssemblyName != null) {
+					Assembly = context.LoadFromAssemblyName (AssemblyName);
+				}
+
+				success = true;
+			}
+			catch (Exception ex) {
+				if (TemplatingEngine.IsCriticalException (ex)) {
+					throw;
+				}
+			}
+			return success;
+		}
+#else
+		public bool Load ()
+		{
+			bool success = false;
+
+			try {
+				if (AssemblyName != null) {
+					Assembly = Assembly.Load (AssemblyName);
+				}
+
+				success = true;
+			}
+			catch (Exception ex) {
+				if (TemplatingEngine.IsCriticalException (ex)) {
+					throw;
+				}
+			}
+			return success;
+		}
+#endif
+
+
+	void Load (CompilerResults results, string fullName)
+		{
+#if FEATURE_APPDOMAINS
+			CurrentDomain.AssemblyResolve += ResolveReferencedAssemblies;
+#endif
 			//results.CompiledAssembly doesn't work on .NET core, it throws a cryptic internal error
 			//use Assembly.LoadFile instead
 			//for debugging we need the assembly
 			Assembly = Assembly.LoadFile (results.PathToAssembly);
+			// grab the assembly name
+			AssemblyName = Assembly.GetName ();
 
 			transformType = Assembly.GetType (fullName);
 			//MS Templating Engine does not look on the type itself, 
@@ -111,14 +167,10 @@ namespace Mono.TextTemplating
 			return Process (textTransformation);
 		}
 
-		public string Process (object textTransformation, ResolveEventHandler resolveEventHandler = null)
+		public string Process (object textTransformation)
 		{
 			if (textTransformation == null) {
 				throw new ArgumentNullException (nameof (textTransformation));
-			}
-
-			if (resolveEventHandler != null) {
-				AppDomain.CurrentDomain.AssemblyResolve += resolveEventHandler;
 			}
 
 			try {
@@ -158,6 +210,9 @@ namespace Mono.TextTemplating
 						output = (string)transformMethod.Invoke (textTransformation, null);
 					}
 					catch (Exception ex) {
+						if (TemplatingEngine.IsCriticalException(ex)) {
+							throw;
+						}
 						errorMethod.Invoke (textTransformation, new object[] { "Error running transform: " + ex });
 					}
 				}
@@ -169,10 +224,12 @@ namespace Mono.TextTemplating
 				return output;
 			}
 			finally {
-			 	AppDomain.CurrentDomain.AssemblyResolve -= resolveEventHandler ?? ResolveReferencedAssemblies;
+#if FEATURE_APPDOMAINS
+				CurrentDomain.AssemblyResolve -= ResolveReferencedAssemblies;
+#endif
 			}
 		}
-
+#if FEATURE_APPDOMAINS
 		Assembly ResolveReferencedAssemblies (object sender, ResolveEventArgs args)
 		{
 			AssemblyName asmName = new AssemblyName (args.Name);
@@ -190,6 +247,7 @@ namespace Mono.TextTemplating
 
 			return null;
 		}
+#endif
 
 		public void Dispose ()
 		{

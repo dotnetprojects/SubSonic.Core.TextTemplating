@@ -218,5 +218,15 @@ namespace Mono.TextTemplating.CodeCompilation
 		// Define the is less than or equal to operator.
 		public static bool operator <= (SemVersion operand1, SemVersion operand2)
 			=> operand1.CompareTo (operand2) <= 0;
+
+		public static bool operator == (SemVersion left, SemVersion right)
+		{
+			return left.Equals (right);
+		}
+
+		public static bool operator != (SemVersion left, SemVersion right)
+		{
+			return !(left == right);
+		}
 	}
 }

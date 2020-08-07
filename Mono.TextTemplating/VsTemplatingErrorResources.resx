@@ -150,4 +150,7 @@
   <data name="SessionHostSessionNotInitialized" xml:space="preserve">
     <value>Session host session is not initialized for {0}.</value>
   </data>
+  <data name="TransformationRunnerDoesNotExists" xml:space="preserve">
+    <value>Transformation runner, {0}, does not exist. use {1} create a runner.</value>
+  </data>
 </root>
