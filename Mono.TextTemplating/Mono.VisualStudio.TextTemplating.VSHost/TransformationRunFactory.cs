@@ -13,7 +13,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 	{
 #if !NET35
 		[NonSerialized]
-		readonly static ConcurrentDictionary<Guid, IProcessTransformationRunner> runners = new ConcurrentDictionary<Guid, IProcessTransformationRunner> ();
+		public readonly static ConcurrentDictionary<Guid, IProcessTransformationRunner> Runners = new ConcurrentDictionary<Guid, IProcessTransformationRunner> ();
 #endif
 		[NonSerialized]
 		readonly IProcessTextTemplatingEngine engine;
@@ -50,7 +50,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			var runnerId = Guid.NewGuid ();
 #if !NET35
 			if (Activator.CreateInstance (runnerType, new object[] { this, runnerId }) is IProcessTransformationRunner runner) {
-				if (runners.TryAdd (runnerId, runner)) {
+				if (Runners.TryAdd (runnerId, runner)) {
 					return runner;
 				}
 			}
@@ -67,7 +67,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		public string PerformTransformation (Guid runnerId)
 		{
 #if !NET35
-			if (runners.TryGetValue(runnerId, out IProcessTransformationRunner runner)) {
+			if (Runners.TryGetValue(runnerId, out IProcessTransformationRunner runner)) {
 				return runner.PerformTransformation ();
 			}
 			throw new InvalidOperationException (string.Format (CultureInfo.CurrentCulture, VsTemplatingErrorResources.TransformationRunnerDoesNotExists, runnerId, nameof (CreateTransformationRunner)));
@@ -83,7 +83,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		public bool DisposeOfRunner(Guid runnerId)
 		{
 #if !NET35
-			return runners.TryRemove (runnerId, out _);
+			return Runners.TryRemove (runnerId, out _);
 #else
 			throw new PlatformNotSupportedException ();
 #endif
