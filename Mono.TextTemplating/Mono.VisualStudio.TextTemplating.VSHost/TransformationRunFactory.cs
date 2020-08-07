@@ -22,9 +22,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		public const string TransformationRunFactoryService = "TransformationRunFactoryService";
 		public const string TransformationRunFactoryMethod = nameof (TransformationRunFactory);
 
-#pragma warning disable CA1051 // Do not declare visible instance fields
-		protected readonly Guid id;
-#pragma warning restore CA1051 // Do not declare visible instance fields
+		private readonly Guid id;
 
 		public TransformationRunFactory (Guid id)
 		{
@@ -33,6 +31,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			engine = new TemplatingEngine ();
 		}
 
+		public Guid ID { get => id; }
 
 		public IProcessTextTemplatingEngine Engine { get => engine; }
 

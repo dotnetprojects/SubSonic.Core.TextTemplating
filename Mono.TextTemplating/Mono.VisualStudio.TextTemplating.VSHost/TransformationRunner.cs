@@ -14,9 +14,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 	public abstract class TransformationRunner
 		: IProcessTransformationRunner
 	{
-		[NonSerialized]
-		internal readonly TransformationRunFactory factory;
 		
+		readonly TransformationRunFactory factory;		
 		readonly Guid id;
 
 		CompiledTemplate compiledTemplate;
@@ -29,11 +28,13 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		{
 			this.factory = factory ?? throw new ArgumentNullException (nameof (factory)); // this tags the runner with the run factory
 			this.id = id;
-			this.Errors = new CompilerErrorCollection();
+
+			Errors = new CompilerErrorCollection();
 		}
 
 		public Guid RunnerId { get => id; }
 
+		public TransformationRunFactory Factory { get => factory; }
 #if NETSTANDARD
 		protected abstract AssemblyLoadContext GetLoadContext ();
 
