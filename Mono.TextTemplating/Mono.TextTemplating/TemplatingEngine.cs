@@ -225,7 +225,7 @@ namespace Mono.TextTemplating
 			}
 #endif
 
-			return new CompiledTemplate (host, results, settings.GetFullName (), settings.Culture, references.ToArray ());
+			return new CompiledTemplate (results, settings.GetFullName (), host, settings.Culture, references.ToArray ());
 		}
 
 #if FEATURE_ROSLYN
