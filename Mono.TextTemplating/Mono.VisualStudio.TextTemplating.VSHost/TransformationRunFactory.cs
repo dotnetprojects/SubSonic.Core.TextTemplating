@@ -31,7 +31,9 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			this.id = id;
 
 			engine = new TemplatingEngine ();
+#if !NET35
 			runners = new ConcurrentDictionary<Guid, IProcessTransformationRunner> ();
+#endif
 		}
 
 
