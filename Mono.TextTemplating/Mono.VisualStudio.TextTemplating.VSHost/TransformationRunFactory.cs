@@ -22,7 +22,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		public const string TransformationRunFactoryService = "TransformationRunFactoryService";
 		public const string TransformationRunFactoryMethod = nameof (TransformationRunFactory);
 
-		private readonly Guid id;
+		readonly Guid id;
 
 		public TransformationRunFactory (Guid id)
 		{
@@ -44,7 +44,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		/// </summary>
 		/// <param name="runnerType"></param>
 		/// <returns></returns>
-		public IProcessTransformationRunner CreateTransformationRunner (Type runnerType)
+		public virtual IProcessTransformationRunner CreateTransformationRunner (Type runnerType)
 		{
 			var runnerId = Guid.NewGuid ();
 #if !NET35
