@@ -37,29 +37,29 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		protected abstract void Unload ();
 
-		protected Assembly ResolveReferencedAssemblies (AssemblyLoadContext context, AssemblyName assemblyName)
-		{
-			if (context == null) {
-				throw new ArgumentNullException (nameof (context));
-			}
-			if (assemblyName == null) {
-				throw new ArgumentNullException (nameof (assemblyName));
-			}
+		//protected Assembly ResolveReferencedAssemblies (AssemblyLoadContext context, AssemblyName assemblyName)
+		//{
+		//	if (context == null) {
+		//		throw new ArgumentNullException (nameof (context));
+		//	}
+		//	if (assemblyName == null) {
+		//		throw new ArgumentNullException (nameof (assemblyName));
+		//	}
 
-			foreach (string assemblyPath in CompiledTemplate.AssemblyFiles) {
-				if (assemblyName.Name == System.IO.Path.GetFileNameWithoutExtension (assemblyPath)) {
-					return context.LoadFromAssemblyPath (assemblyPath);
-				}
-			}
+		//	foreach (string assemblyPath in CompiledTemplate.AssemblyFiles) {
+		//		if (assemblyName.Name == System.IO.Path.GetFileNameWithoutExtension (assemblyPath)) {
+		//			return context.LoadFromAssemblyPath (assemblyPath);
+		//		}
+		//	}
 
-			string filePath = Host.ResolveAssemblyReference ($"{assemblyName.Name}.dll");
+		//	string filePath = Host.ResolveAssemblyReference ($"{assemblyName.Name}.dll");
 
-			if (System.IO.File.Exists (filePath)) {
-				return context.LoadFromAssemblyPath (filePath);
-			}
+		//	if (System.IO.File.Exists (filePath)) {
+		//		return context.LoadFromAssemblyPath (filePath);
+		//	}
 
-			return null;
-		}
+		//	return null;
+		//}
 #else
 		Assembly ResolveReferencedAssemblies (object sender, ResolveEventArgs args)
 		{
