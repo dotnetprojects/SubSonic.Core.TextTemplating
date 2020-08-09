@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using Mono.VisualStudio.TextTemplating;
+using Mono.VisualStudio.TextTemplating.VSHost;
 #if NETSTANDARD
 using System.Runtime.Loader;
 #endif
@@ -77,17 +78,17 @@ namespace Mono.TextTemplating
 		public IEnumerable<string> AssemblyFiles { get; private set; }
 
 #if NETSTANDARD
-		public bool Load (AssemblyLoadContext context)
+		public bool Load (TransformationRunner runner)
 		{
 			bool success = false;
 
-			if (context == null) {
-				throw new ArgumentNullException (nameof (context));
+			if (runner == null) {
+				throw new ArgumentNullException (nameof (runner));
 			}
 
 			try {
 				if (AssemblyName != null) {
-					Assembly = context.LoadFromAssemblyName (AssemblyName);
+					Assembly = runner.LoadFromAssemblyName (AssemblyName);
 				}
 
 				success = true;
