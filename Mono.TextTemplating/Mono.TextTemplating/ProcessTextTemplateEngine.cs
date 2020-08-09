@@ -90,6 +90,7 @@ namespace Mono.TextTemplating
 					if (IsCriticalException (ex)) {
 						throw;
 					}
+					pt.LogError (ex.ToString (), new Location (host.TemplateFile));
 				}
 				if (runner != null && !runner.Errors.HasErrors) {
 					ProcessReferences (host, pt, settings);
