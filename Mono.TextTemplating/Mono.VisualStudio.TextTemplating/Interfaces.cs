@@ -95,11 +95,18 @@ namespace Mono.VisualStudio.TextTemplating
 		/// Get the errors, if anything prevented a successful run.
 		/// </summary>
 		CompilerErrorCollection Errors { get; }
+		/// <summary>
+		/// Get the runner identifier
+		/// </summary>
 		Guid RunnerId { get; }
 	}
 
 	public interface IProcessTransformationRunFactory
 	{
+		/// <summary>
+		/// Get the Factory ID
+		/// </summary>
+		Guid FactoryId { get; }
 		/// <summary>
 		/// Run Factory is alive and ready
 		/// </summary>
@@ -131,7 +138,7 @@ namespace Mono.VisualStudio.TextTemplating
 		/// </summary>
 		/// <param name="runnerId">the runner id</param>
 		/// <returns>result of transformation run.</returns>
-		string PerformTransformation (Guid runnerId);
+		string StartTransformation (Guid runnerId);
 	}
 
 	public interface IProcessTextTemplatingEngine
