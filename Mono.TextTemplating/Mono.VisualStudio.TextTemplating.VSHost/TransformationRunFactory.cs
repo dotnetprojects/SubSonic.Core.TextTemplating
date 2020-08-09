@@ -15,6 +15,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		[NonSerialized]
 		public readonly static ConcurrentDictionary<Guid, IProcessTransformationRunner> Runners = new ConcurrentDictionary<Guid, IProcessTransformationRunner> ();
 #endif
+		[NonSerialized]
 		readonly IProcessTextTemplatingEngine engine;
 
 
