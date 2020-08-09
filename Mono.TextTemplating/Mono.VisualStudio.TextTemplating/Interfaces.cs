@@ -81,7 +81,7 @@ namespace Mono.VisualStudio.TextTemplating
 		/// start the transformation on compiled assembly through remote procedure call
 		/// </summary>
 		/// <returns></returns>
-		string PerformTransformation ();
+		//string PerformTransformation ();
 		/// <summary>
 		/// prepare the transformation by sending the arguments through a remote procedure call
 		/// </summary>
@@ -90,11 +90,11 @@ namespace Mono.VisualStudio.TextTemplating
 		/// <param name="host"><see cref="ITextTemplatingEngineHost" /> transfer the host information with session.</param>
 		/// <param name="settings"><see cref="TemplateSettings"/> template settings provide information about the run.</param>
 		/// <returns></returns>
-		bool PrepareTransformation (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings);
+		//bool PrepareTransformation (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings);
 		/// <summary>
 		/// Get the errors, if anything prevented a successful run.
 		/// </summary>
-		CompilerErrorCollection Errors { get; }
+		//CompilerErrorCollection Errors { get; }
 		/// <summary>
 		/// Get the runner identifier
 		/// </summary>

@@ -65,7 +65,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		public virtual bool PrepareTransformation (Guid runnerId, ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings)
 		{
 #if !NET35
-			if (Runners.TryGetValue(runnerId, out IProcessTransformationRunner runner)) {
+			if (Runners.TryGetValue(runnerId, out IProcessTransformationRunner _runner) &&
+				_runner is TransformationRunner runner) {
 				return runner.PrepareTransformation (pt, content, host, settings);
 			}
 			return default;
@@ -81,7 +82,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		public string StartTransformation (Guid runnerId)
 		{
 #if !NET35
-			if (Runners.TryGetValue(runnerId, out IProcessTransformationRunner runner)) {
+			if (Runners.TryGetValue(runnerId, out IProcessTransformationRunner _runner) &&
+				_runner is TransformationRunner runner) {
 				return runner.PerformTransformation ();
 			}
 			throw new InvalidOperationException (string.Format (CultureInfo.CurrentCulture, VsTemplatingErrorResources.TransformationRunnerDoesNotExists, runnerId, nameof (CreateTransformationRunner)));
