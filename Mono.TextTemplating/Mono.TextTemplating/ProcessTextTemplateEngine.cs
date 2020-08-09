@@ -13,7 +13,8 @@ namespace Mono.TextTemplating
 	public partial class TemplatingEngine
 		: IProcessTextTemplatingEngine
 	{
-		public IProcessTransformationRunner PrepareTransformationRunner (string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, bool debugging = false)
+		public IProcessTransformationRunner PrepareTransformationRunner<TTransformationRunner>(string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, bool debugging = false)
+			where TTransformationRunner: class
 		{
 			if (content == null) {
 				throw new ArgumentNullException (nameof(content));
@@ -43,7 +44,7 @@ namespace Mono.TextTemplating
 
 				settings.Debug = debugging;
 
-				run = CompileAndPrepareRun (pt, content, host, runFactory, settings);
+				run = CompileAndPrepareRun<TTransformationRunner> (pt, content, host, runFactory, settings);
 			} catch(Exception ex) {
 				if (IsCriticalException(ex)) {
 					throw;
@@ -57,7 +58,8 @@ namespace Mono.TextTemplating
 			return run;
 		}
 
-		protected virtual IProcessTransformationRunner CompileAndPrepareRun (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, TemplateSettings settings) 
+		protected virtual IProcessTransformationRunner CompileAndPrepareRun<TTransformationRunner>(ParsedTemplate pt, string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, TemplateSettings settings)
+			where TTransformationRunner: class
 		{
 			TransformationRunner runner = null;
 			bool success = false;
@@ -80,7 +82,7 @@ namespace Mono.TextTemplating
 
 			try {
 				try {
-					if (runFactory.CreateTransformationRunner (typeof (TransformationRunner)) is TransformationRunner theRunner) {
+					if (runFactory.CreateTransformationRunner (typeof (TTransformationRunner)) is TransformationRunner theRunner) {
 						runner = theRunner;
 					}
 				}
