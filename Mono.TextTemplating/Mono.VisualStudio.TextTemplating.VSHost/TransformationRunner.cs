@@ -230,12 +230,12 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public virtual bool PrepareTransformation (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings)
 		{
-			this.Host = host ?? throw new ArgumentNullException (nameof (host));
-			this.Settings = settings ?? throw new ArgumentNullException (nameof (settings));
+			Host = host ?? throw new ArgumentNullException (nameof (host));
+			Settings = settings ?? throw new ArgumentNullException (nameof (settings));
 
 			try {
-				this.Settings.Assemblies.Add (base.GetType ().Assembly.Location);
-				this.Settings.Assemblies.Add (typeof (ITextTemplatingEngineHost).Assembly.Location);
+				Settings.Assemblies.Add (base.GetType ().Assembly.Location);
+				Settings.Assemblies.Add (typeof (ITextTemplatingEngineHost).Assembly.Location);
 				CompiledTemplate = LocateAssembly (pt, content);
 			}
 			catch(Exception ex) {

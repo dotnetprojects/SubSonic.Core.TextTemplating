@@ -116,7 +116,16 @@ namespace Mono.VisualStudio.TextTemplating
 		/// <param name="runnerId">the runner id</param>
 		/// <returns>true, if successful</returns>
 		bool DisposeOfRunner (Guid runnerId);
-
+		/// <summary>
+		/// Prepare the runner that the factory created to perform the transformation
+		/// </summary>
+		/// <param name="runnerId"></param>
+		/// <param name="pt"></param>
+		/// <param name="content"></param>
+		/// <param name="host"></param>
+		/// <param name="settings"></param>
+		/// <returns></returns>
+		bool PrepareTransformation (Guid runnerId, ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings);
 		/// <summary>
 		/// Start the transformation from a template to a code file
 		/// </summary>

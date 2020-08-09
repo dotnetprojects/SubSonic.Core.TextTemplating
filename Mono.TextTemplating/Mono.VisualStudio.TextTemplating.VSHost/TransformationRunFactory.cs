@@ -57,6 +57,18 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			throw new PlatformNotSupportedException ();
 #endif
 		}
+
+		public virtual bool PrepareTransformation (Guid runnerId, ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings)
+		{
+#if !NET35
+			if (Runners.TryGetValue(runnerId, out IProcessTransformationRunner runner)) {
+				return runner.PrepareTransformation (pt, content, host, settings);
+			}
+			return default;
+#else
+			throw new PlatformNotSupportedException ();
+#endif
+		}
 		/// <summary>
 		/// 
 		/// </summary>

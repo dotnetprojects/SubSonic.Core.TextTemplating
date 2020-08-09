@@ -98,7 +98,7 @@ namespace Mono.TextTemplating
 						//with app domains dissappearing we may not be able to pre load anything
 						//runner.PreLoadAssemblies (settings.Assemblies);
 						try {
-							success = runner.PrepareTransformation (pt, content, settings.HostSpecific ? host : null, settings);
+							success = runFactory.PrepareTransformation (runner.RunnerId, pt, content, settings.HostSpecific ? host : null, settings);
 						}
 						catch (SerializationException) {
 							pt.LogError (VsTemplatingErrorResources.SessionHostMarshalError, new Location (host.TemplateFile));
