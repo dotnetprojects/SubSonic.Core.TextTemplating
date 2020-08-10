@@ -57,7 +57,7 @@ namespace Mono.TextTemplating
 
 			ParsedTemplate pt = ParsedTemplate.FromText (content, host);
 
-			IProcessTransformationRunner run = null;
+			IProcessTransformationRunner runner = null;
 
 			try {
 				if (pt.Errors.HasErrors) {
@@ -67,7 +67,7 @@ namespace Mono.TextTemplating
 
 				settings.Debug = debugging;
 
-				run = CompileAndPrepareRun (pt, content, host, runFactory, settings);
+				runner = CompileAndPrepareRunner (pt, content, host, runFactory, settings);
 			}
 			catch (Exception ex) {
 				if (IsCriticalException (ex)) {
@@ -79,10 +79,10 @@ namespace Mono.TextTemplating
 				host.LogErrors (pt.Errors);
 			}
 
-			return run;
+			return runner;
 		}
 
-		protected virtual IProcessTransformationRunner CompileAndPrepareRun (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, TemplateSettings settings)
+		protected virtual IProcessTransformationRunner CompileAndPrepareRunner (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, TemplateSettings settings)
 		{
 			TransformationRunner runner = null;
 			bool success = false;
@@ -134,13 +134,11 @@ namespace Mono.TextTemplating
 				}
 				pt.LogError (ex.ToString (), new Location (host.TemplateFile, -1, -1));
 			}
-			//finally {
-			//	if (runner != null) {
-			//		// using RPC this will not be possible
-			//		pt.Errors.AddRange (runner.Errors.ToCompilerErrorCollection());
-			//		runner.ClearErrors ();
-			//	}
-			//}
+			finally {
+				if (runner != null) {
+					pt.Errors.AddRange (runner.Errors);
+				}
+			}
 
 			return success ? runner : null;
 		}

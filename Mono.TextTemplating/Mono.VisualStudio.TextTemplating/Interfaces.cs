@@ -78,23 +78,9 @@ namespace Mono.VisualStudio.TextTemplating
 	public interface IProcessTransformationRunner
 	{
 		/// <summary>
-		/// start the transformation on compiled assembly through remote procedure call
-		/// </summary>
-		/// <returns></returns>
-		//string PerformTransformation ();
-		/// <summary>
-		/// prepare the transformation by sending the arguments through a remote procedure call
-		/// </summary>
-		/// <param name="pt"><see cref="ParsedTemplate" /></param>
-		/// <param name="content">content of the prepared T4 template</param>
-		/// <param name="host"><see cref="ITextTemplatingEngineHost" /> transfer the host information with session.</param>
-		/// <param name="settings"><see cref="TemplateSettings"/> template settings provide information about the run.</param>
-		/// <returns></returns>
-		//bool PrepareTransformation (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings);
-		/// <summary>
 		/// Get the errors, if anything prevented a successful run.
 		/// </summary>
-		//CompilerErrorCollection Errors { get; }
+		TemplateErrorCollection Errors { get; }
 		/// <summary>
 		/// Get the runner identifier
 		/// </summary>
