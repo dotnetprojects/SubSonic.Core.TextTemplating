@@ -140,6 +140,11 @@ namespace Mono.VisualStudio.TextTemplating
 		/// <param name="runnerId">the runner id</param>
 		/// <returns>result of transformation run.</returns>
 		string StartTransformation (Guid runnerId);
+		/// <summary>
+		/// Get all the errors that were logged by the transformation
+		/// </summary>
+		/// <returns></returns>
+		TemplateErrorCollection GetErrors (Guid runnerId);
 	}
 
 	public interface IProcessTextTemplatingEngine

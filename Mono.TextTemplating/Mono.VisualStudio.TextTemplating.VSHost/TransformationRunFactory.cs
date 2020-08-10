@@ -117,5 +117,18 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			throw new NotSupportedException ();
 #endif
 		}
+
+		public TemplateErrorCollection GetErrors (Guid runnerId)
+		{
+#if !NET35
+			if (Runners.TryGetValue (runnerId, out IProcessTransformationRunner _runner) &&
+				_runner is TransformationRunner runner) {
+				return runner.Errors;
+			}
+			throw new InvalidOperationException (string.Format (CultureInfo.CurrentCulture, VsTemplatingErrorResources.TransformationRunnerDoesNotExists, runnerId, nameof (CreateTransformationRunner)));
+#else
+			throw new NotSupportedException ();
+#endif
+		}
 	}
 }
