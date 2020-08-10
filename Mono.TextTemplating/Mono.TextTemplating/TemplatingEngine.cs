@@ -144,8 +144,18 @@ namespace Mono.TextTemplating
 			}
 
 			var options = new CodeGeneratorOptions ();
-			using (var sw = new StringWriter ()) {
-				settings.Provider.GenerateCodeFromCompileUnit (ccu, sw, options);
+			using (var sw = new StringWriter ())
+			using (CodeDomProvider provider = settings.GetCodeDomProvider ()) {
+				if (provider != null) {
+					provider.GenerateCodeFromCompileUnit (ccu, sw, options);
+				} else {
+					pt.Errors.Add (new TemplateError () {
+						Message = "A provider could not be found for the language '" + settings.Language + "'"
+					});
+
+					sw.Write (VsTemplatingErrorResources.ErrorOutput);
+				}
+
 				return sw.ToString ();
 			}
 		}
@@ -235,66 +245,67 @@ namespace Mono.TextTemplating
 		{
 			string sourceText;
 			var genOptions = new CodeGeneratorOptions ();
-			using (var sw = new StringWriter ()) {
-				settings.Provider.GenerateCodeFromCompileUnit (ccu, sw, genOptions);
+			using (var sw = new StringWriter ())
+			using (CodeDomProvider provider = settings.GetCodeDomProvider ()) {
+				provider.GenerateCodeFromCompileUnit (ccu, sw, genOptions);
 				sourceText = sw.ToString ();
-			}
 
-			// this may throw, so do it before writing source files
-			var compiler = GetOrCreateCompiler (settings.RuntimeKind);
 
-			var tempFolder = Path.GetTempFileName ();
-			File.Delete (tempFolder);
-			Directory.CreateDirectory (tempFolder);
+				// this may throw, so do it before writing source files
+				var compiler = GetOrCreateCompiler (settings.RuntimeKind);
 
-			if (settings.Log != null) {
-				settings.Log.WriteLine ($"Generating code in '{tempFolder}'");
-			}
+				var tempFolder = Path.GetTempFileName ();
+				File.Delete (tempFolder);
+				Directory.CreateDirectory (tempFolder);
 
-			var sourceFilename = Path.Combine (tempFolder, settings.Name + "." + settings.Provider.FileExtension);
-			File.WriteAllText (sourceFilename, sourceText);
-
-			var args = new CodeCompilerArguments ();
-			args.AssemblyReferences.AddRange (references);
-			args.Debug = settings.Debug;
-			args.SourceFiles.Add (sourceFilename);
-			args.AdditionalArguments = settings.CompilerOptions;
-			args.OutputPath = Path.Combine (tempFolder, settings.Name + ".dll");
-			args.TempDirectory = tempFolder;
-
-			var result = compiler.CompileFile (args, settings.Log, CancellationToken.None).Result;
-
-			var r = new CompilerResults (new TempFileCollection ());
-			r.TempFiles.AddFile (sourceFilename, false);
-
-			if (result.ResponseFile != null) {
-				r.TempFiles.AddFile (result.ResponseFile, false);
-			}
-
-			r.NativeCompilerReturnValue = result.ExitCode;
-			r.Output.AddRange (result.Output.ToArray ());
-			r.Errors.AddRange (result.Errors.Select (e => new CompilerError (e.Origin ?? "", e.Line, e.Column, e.Code, e.Message) { IsWarning = !e.IsError }).ToArray ());
-
-			if (result.Success) {
-				r.TempFiles.AddFile (args.OutputPath, true);
-				if (args.Debug) {
-					r.TempFiles.AddFile (Path.ChangeExtension (args.OutputPath, ".pdb"), true);
+				if (settings.Log != null) {
+					settings.Log.WriteLine ($"Generating code in '{tempFolder}'");
 				}
-				r.PathToAssembly = args.OutputPath;
-			} else if (!r.Errors.HasErrors) {
-				r.Errors.Add (new CompilerError (null, 0, 0, null, $"The compiler exited with code {result.ExitCode}"));
-			}
 
-			if (!args.Debug) {
-				if (r.TempFiles is IDisposable disposable) {
-					disposable.Dispose ();
+				var sourceFilename = Path.Combine (tempFolder, settings.Name + "." + provider.FileExtension);
+				File.WriteAllText (sourceFilename, sourceText);
+
+				var args = new CodeCompilerArguments ();
+				args.AssemblyReferences.AddRange (references);
+				args.Debug = settings.Debug;
+				args.SourceFiles.Add (sourceFilename);
+				args.AdditionalArguments = settings.CompilerOptions;
+				args.OutputPath = Path.Combine (tempFolder, settings.Name + ".dll");
+				args.TempDirectory = tempFolder;
+
+				var result = compiler.CompileFile (args, settings.Log, CancellationToken.None).Result;
+
+				var r = new CompilerResults (new TempFileCollection ());
+				r.TempFiles.AddFile (sourceFilename, false);
+
+				if (result.ResponseFile != null) {
+					r.TempFiles.AddFile (result.ResponseFile, false);
 				}
-			}
-			else {
-				r.TempFiles.KeepFiles = args.Debug;
-			}
 
-			return r;
+				r.NativeCompilerReturnValue = result.ExitCode;
+				r.Output.AddRange (result.Output.ToArray ());
+				r.Errors.AddRange (result.Errors.Select (e => new CompilerError (e.Origin ?? "", e.Line, e.Column, e.Code, e.Message) { IsWarning = !e.IsError }).ToArray ());
+
+				if (result.Success) {
+					r.TempFiles.AddFile (args.OutputPath, true);
+					if (args.Debug) {
+						r.TempFiles.AddFile (Path.ChangeExtension (args.OutputPath, ".pdb"), true);
+					}
+					r.PathToAssembly = args.OutputPath;
+				} else if (!r.Errors.HasErrors) {
+					r.Errors.Add (new CompilerError (null, 0, 0, null, $"The compiler exited with code {result.ExitCode}"));
+				}
+
+				if (!args.Debug) {
+					if (r.TempFiles is IDisposable disposable) {
+						disposable.Dispose ();
+					}
+				} else {
+					r.TempFiles.KeepFiles = args.Debug;
+				}
+
+				return r;
+			}
 		}
 #else
 		static CompilerResults CompileCode (IEnumerable<string> references, TemplateSettings settings, CodeCompileUnit ccu)
@@ -306,16 +317,26 @@ namespace Mono.TextTemplating
 				GenerateInMemory = false,
 			};
 
-			foreach (var r in references)
+			foreach (var r in references) {
 				pars.ReferencedAssemblies.Add (r);
+			}
 
-			if (settings.Debug)
+			if (settings.Debug) {
 				pars.TempFiles.KeepFiles = true;
-			if (StringUtil.IsNullOrWhiteSpace (pars.CompilerOptions))
+			}
+			if (StringUtil.IsNullOrWhiteSpace (pars.CompilerOptions)) {
 				pars.CompilerOptions = "/noconfig";
-			else if (!pars.CompilerOptions.Contains ("/noconfig"))
+			} else if (!pars.CompilerOptions.Contains ("/noconfig")) {
 				pars.CompilerOptions = "/noconfig " + pars.CompilerOptions;
-			return settings.Provider.CompileAssemblyFromDom (pars, ccu);
+			}
+
+
+			using (CodeDomProvider provider = settings.GetCodeDomProvider ()) {
+				if (provider != null) {
+					return provider.CompileAssemblyFromDom (pars, ccu);
+				}
+				throw new InvalidOperationException ("A provider could not be found for the language '" + settings.Language + "'");
+			}
 		}
 #endif
 
@@ -497,19 +518,14 @@ namespace Mono.TextTemplating
 			}
 
 			if (settings.Language == "C#v3.5") {
-				var providerOptions = new Dictionary<string, string> {
-					{ "CompilerVersion", "v3.5" }
-				};
-				settings.Provider = new CSharpCodeProvider (providerOptions);
-			}
-			else {
-				settings.Provider = CodeDomProvider.CreateProvider (settings.Language);
+				settings.Language = "C#";
+				settings.CodeProviderOptions.Add ("CompilerVersion", "v3.5");
 			}
 
-			if (settings.Provider == null) {
-				pt.LogError ("A provider could not be found for the language '" + settings.Language + "'");
-				return settings;
-			}
+			//if (settings.Provider == null) {
+			//	pt.LogError ("A provider could not be found for the language '" + settings.Language + "'");
+			//	return settings;
+			//}
 
 			settings.UseRelativeLinePragmas = relativeLinePragmas;
 
@@ -623,24 +639,26 @@ namespace Mono.TextTemplating
 
 		static void ProcessDirectives (string content, ParsedTemplate pt, TemplateSettings settings)
 		{
-			foreach (var processor in settings.DirectiveProcessors.Values) {
-				processor.StartProcessingRun (settings.Provider, content, pt.Errors.ToCompilerErrorCollection());
-			}
+			using (CodeDomProvider provider = settings.GetCodeDomProvider ()) {
+				foreach (var processor in settings.DirectiveProcessors.Values) {
+					processor.StartProcessingRun (provider, content, pt.Errors.ToCompilerErrorCollection ());
+				}
 
-			foreach (var dt in settings.CustomDirectives) {
-				var processor = settings.DirectiveProcessors[dt.ProcessorName];
-				processor.ProcessDirective (dt.Directive.Name, dt.Directive.Attributes);
-			}
+				foreach (var dt in settings.CustomDirectives) {
+					var processor = settings.DirectiveProcessors[dt.ProcessorName];
+					processor.ProcessDirective (dt.Directive.Name, dt.Directive.Attributes);
+				}
 
-			foreach (var processor in settings.DirectiveProcessors.Values) {
-				processor.FinishProcessingRun ();
+				foreach (var processor in settings.DirectiveProcessors.Values) {
+					processor.FinishProcessingRun ();
 
-				var imports = processor.GetImportsForProcessingRun ();
-				if (imports != null)
-					settings.Imports.UnionWith (imports);
-				var references = processor.GetReferencesForProcessingRun ();
-				if (references != null)
-					settings.Assemblies.UnionWith (references);
+					var imports = processor.GetImportsForProcessingRun ();
+					if (imports != null)
+						settings.Imports.UnionWith (imports);
+					var references = processor.GetReferencesForProcessingRun ();
+					if (references != null)
+						settings.Assemblies.UnionWith (references);
+				}
 			}
 		}
 
@@ -751,8 +769,13 @@ namespace Mono.TextTemplating
 					if (helperMode) {
 						//convert the statement into a snippet member and attach it to the top level type
 						//TODO: is there a way to do this for languages that use indentation for blocks, e.g. python?
-						using (var writer = new StringWriter ()) {
-							settings.Provider.GenerateCodeFromStatement (st, writer, null);
+						using (var writer = new StringWriter ())
+						using (CodeDomProvider provider = settings.GetCodeDomProvider ()) {
+							if (provider != null) {
+								provider.GenerateCodeFromStatement (st, writer, null);
+							} else {
+								writer.WriteLine (VsTemplatingErrorResources.ErrorOutput);
+							}
 							var text = writer.ToString ();
 							if (!string.IsNullOrEmpty (text))
 								type.Members.Add (CreateSnippetMember (text, location));
@@ -1175,13 +1198,14 @@ namespace Mono.TextTemplating
 
 			helperCls.Members.Add (meth);
 
-
-			var helperFieldName = settings.Provider.CreateValidIdentifier ("_toStringHelper");
-			var helperField = PrivateField (new CodeTypeReference (helperCls.Name), helperFieldName);
-			helperField.InitExpression = new CodeObjectCreateExpression (helperField.Type);
-			type.Members.Add (helperField);
-			type.Members.Add (GenerateGetterProperty ("ToStringHelper", helperField));
-			type.Members.Add (helperCls);
+			using (CodeDomProvider provider = settings.GetCodeDomProvider ()) {
+				var helperFieldName = provider.CreateValidIdentifier ("_toStringHelper");
+				var helperField = PrivateField (new CodeTypeReference (helperCls.Name), helperFieldName);
+				helperField.InitExpression = new CodeObjectCreateExpression (helperField.Type);
+				type.Members.Add (helperField);
+				type.Members.Add (GenerateGetterProperty ("ToStringHelper", helperField));
+				type.Members.Add (helperCls);
+			}
 		}
 
 #region CodeDom helpers

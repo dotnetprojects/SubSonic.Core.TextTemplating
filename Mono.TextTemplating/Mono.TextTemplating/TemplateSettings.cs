@@ -31,6 +31,8 @@ using Mono.VisualStudio.TextTemplating;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.CodeDom.Compiler;
+using Microsoft.CSharp;
 #if !NET35
 using Mono.TextTemplating.CodeCompilation;
 #endif
@@ -46,6 +48,7 @@ namespace Mono.TextTemplating
 			Assemblies = new HashSet<string> ();
 			CustomDirectives  = new List<CustomDirective> ();
 			DirectiveProcessors = new Dictionary<string, IDirectiveProcessor> ();
+			CodeProviderOptions = new Dictionary<string, string> ();
 		}
 		
 		public bool HostSpecific { get; set; }
@@ -61,7 +64,8 @@ namespace Mono.TextTemplating
 		public string Namespace { get; set; }
 		public HashSet<string> Imports { get; private set; }
 		public HashSet<string> Assemblies { get; private set; }
-		public System.CodeDom.Compiler.CodeDomProvider Provider { get; set; }
+		public Dictionary<string, string> CodeProviderOptions { get; private set; }
+		//public System.CodeDom.Compiler.CodeDomProvider Provider { get; set; }
 		public string Language { get; set; }
 		public string CompilerOptions { get; set; }
 		public Encoding Encoding { get; set; }
@@ -77,6 +81,18 @@ namespace Mono.TextTemplating
 		public Type HostType { get; set; }
 
 		public string GetFullName () => string.IsNullOrEmpty (Namespace) ? Name : Namespace + "." + Name;
+
+		public CodeDomProvider GetCodeDomProvider()
+		{
+#if !NET35
+			if (CodeDomProvider.CreateProvider (Language, CodeProviderOptions) is CodeDomProvider provider) {
+#else
+			if (new CSharpCodeProvider(CodeProviderOptions) is CodeDomProvider provider) {
+#endif
+			return provider;
+			}
+			return default;
+		}
 	}
 	
 	public class CustomDirective

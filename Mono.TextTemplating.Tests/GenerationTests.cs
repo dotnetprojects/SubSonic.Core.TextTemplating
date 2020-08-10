@@ -155,9 +155,10 @@ namespace Mono.TextTemplating.Tests
 			}
 			
 			var opts = new CodeGeneratorOptions ();
-			using (var writer = new System.IO.StringWriter ()) {
+			using (var writer = new StringWriter ())
+			using (CodeDomProvider provider = settings.GetCodeDomProvider()) {
 				writer.NewLine = generatorNewline;
-				settings.Provider.GenerateCodeFromCompileUnit (ccu, writer, opts);
+				provider.GenerateCodeFromCompileUnit (ccu, writer, opts);
 				return writer.ToString ();
 			}
 		}
