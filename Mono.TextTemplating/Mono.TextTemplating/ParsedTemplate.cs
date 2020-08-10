@@ -29,9 +29,11 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using Mono.VisualStudio.TextTemplating;
+using Mono.VisualStudio.TextTemplating.VSHost;
 
 namespace Mono.TextTemplating
 {
+	[Serializable]
 	public class ParsedTemplate
 	{
 		readonly List<ISegment> importedHelperSegments = new List<ISegment> ();
@@ -62,7 +64,7 @@ namespace Mono.TextTemplating
 			}
 		}
 
-		public CompilerErrorCollection Errors { get; } = new CompilerErrorCollection ();
+		public TemplateErrorCollection Errors { get; } = new TemplateErrorCollection ();
 
 		public static ParsedTemplate FromText (string content, ITextTemplatingEngineHost host)
 		{
@@ -189,17 +191,7 @@ namespace Mono.TextTemplating
 		
 		void LogError (string message, Location location, bool isWarning)
 		{
-			var err = new CompilerError ();
-			err.ErrorText = message;
-			if (location.FileName != null) {
-				err.Line = location.Line;
-				err.Column = location.Column;
-				err.FileName = location.FileName ?? string.Empty;
-			} else {
-				err.FileName = rootFileName ?? string.Empty;
-			}
-			err.IsWarning = isWarning;
-			Errors.Add (err);
+			Errors.Add (new TemplateError (message, string.Empty, location, isWarning));
 		}
 
 		public void LogError (string message) => LogError (message, Location.Empty, false);

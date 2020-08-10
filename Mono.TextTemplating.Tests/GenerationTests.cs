@@ -136,7 +136,7 @@ namespace Mono.TextTemplating.Tests
 		{
 			var pt = ParsedTemplate.FromText (content, host);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors);
+				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
 				return null;
 			}
 			
@@ -144,13 +144,13 @@ namespace Mono.TextTemplating.Tests
 			if (name != null)
 				settings.Namespace = name;
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors);
+				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
 				return null;
 			}
 			
 			var ccu = TemplatingEngine.GenerateCompileUnit (host, content, pt, settings);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors);
+				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
 				return null;
 			}
 			

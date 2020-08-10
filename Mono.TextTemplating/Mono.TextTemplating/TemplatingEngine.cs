@@ -95,7 +95,7 @@ namespace Mono.TextTemplating
 
 			var pt = ParsedTemplate.FromText (content, host);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors);
+				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
 				return null;
 			}
 			return PreprocessTemplateInternal (pt, content, host, className, classNamespace, out language, out references);
@@ -124,7 +124,7 @@ namespace Mono.TextTemplating
 
 			settings = settings ?? GetSettings (host, pt);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors);
+				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
 				return null;
 			}
 			settings.Name = className;
@@ -136,7 +136,7 @@ namespace Mono.TextTemplating
 			var ccu = GenerateCompileUnit (host, content, pt, settings);
 			references = ProcessReferences (host, pt, settings).ToArray ();
 
-			host.LogErrors (pt.Errors);
+			host.LogErrors (pt.Errors.ToCompilerErrorCollection());
 			if (pt.Errors.HasErrors) {
 				return null;
 			}
@@ -157,7 +157,7 @@ namespace Mono.TextTemplating
 
 			var pt = ParsedTemplate.FromText (content, host);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors);
+				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
 				return null;
 			}
 
@@ -186,7 +186,7 @@ namespace Mono.TextTemplating
 		{
 			settings = settings ?? GetSettings (host, pt);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors);
+				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
 				return null;
 			}
 
@@ -201,13 +201,13 @@ namespace Mono.TextTemplating
 			var ccu = GenerateCompileUnit (host, content, pt, settings);
 			var references = ProcessReferences (host, pt, settings);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors);
+				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
 				return null;
 			}
 
 			var results = CompileCode (references, settings, ccu);
 			if (results.Errors.HasErrors) {
-				host.LogErrors (pt.Errors);
+				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
 				host.LogErrors (results.Errors);
 				return null;
 			}
@@ -629,7 +629,7 @@ namespace Mono.TextTemplating
 		static void ProcessDirectives (string content, ParsedTemplate pt, TemplateSettings settings)
 		{
 			foreach (var processor in settings.DirectiveProcessors.Values) {
-				processor.StartProcessingRun (settings.Provider, content, pt.Errors);
+				processor.StartProcessingRun (settings.Provider, content, pt.Errors.ToCompilerErrorCollection());
 			}
 
 			foreach (var dt in settings.CustomDirectives) {

@@ -201,7 +201,7 @@ namespace Mono.TextTemplating
 			}
 
 			if (pt.Errors.Count > 0) {
-				generator.Errors.AddRange (pt.Errors);
+				generator.Errors.AddRange (pt.Errors.ToCompilerErrorCollection());
 			}
 
 			string outputContent = null;
