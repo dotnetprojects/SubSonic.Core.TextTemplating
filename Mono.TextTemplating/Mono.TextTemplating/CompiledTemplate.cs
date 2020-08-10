@@ -221,7 +221,7 @@ namespace Mono.TextTemplating
 					}
 				}
 
-				host.LogErrors (errors);
+				host.LogErrors (errors.ToTemplateErrorCollection());
 
 				ToStringHelper.FormatProvider = CultureInfo.InvariantCulture;
 

@@ -1,5 +1,5 @@
 // 
-// TemplateErrorList.cs
+// TemplateError.cs
 //  
 // Author:
 //       Kenneth Carter <kccarter32@gmail.com>
@@ -26,46 +26,40 @@
 
 using System;
 using System.CodeDom.Compiler;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Mono.VisualStudio.TextTemplating.VSHost
+namespace Mono.TextTemplating
 {
 	[Serializable]
-	public class TemplateErrorCollection
-		: IEnumerable<TemplateError>
+	public class TemplateError
 	{
-		readonly ArrayList errors;
+		public TemplateError () { }
 
-		public TemplateErrorCollection()
+		public TemplateError(string message, Location location)
+			: this(message, string.Empty, location, false)
+		{ }
+
+		public TemplateError (string message, string errorNumber, Location location)
+			: this (message, errorNumber, location, false)
+		{ }
+
+		public TemplateError (string message, string errorNumber, Location location, bool isWarning)
 		{
-			errors = new ArrayList ();
+			Message = message;
+			ErrorNumber = errorNumber;
+			Location = location;
+			IsWarning = isWarning;
 		}
 
-		public bool HasErrors => this.Any ();
+		public string ErrorNumber { get; set; }
+		public string Message { get; set; }
+		public Location Location { get; set; }
+		public bool IsWarning { get; set; }
 
-		public int Count => errors.Count;
-
-		public void Add (TemplateError error) => errors.Add (error);
-
-		public void Clear () => errors.Clear();
-
-		public CompilerErrorCollection ToCompilerErrorCollection()
+		public CompilerError ToCompilerError()
 		{
-			return new CompilerErrorCollection (this.Select (x => x.ToCompilerError ()).ToArray ());
-		}
-
-		public IEnumerator<TemplateError> GetEnumerator ()
-		{
-			foreach(TemplateError error in errors) {
-				yield return error;
-			}
-		}
-
-		IEnumerator IEnumerable.GetEnumerator ()
-		{
-			return errors.GetEnumerator ();
+			return new CompilerError (Location.FileName, Location.Line, Location.Column, ErrorNumber, Message) {
+				IsWarning = IsWarning
+			};
 		}
 	}
 }

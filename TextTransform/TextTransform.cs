@@ -143,10 +143,11 @@ namespace Mono.TextTemplating
 					Console.Write ("Preprocessing '{0}' into class '{1}.{2}' failed.", inputFile, classNamespace, className);
 				}
 			}
-			
-			foreach (System.CodeDom.Compiler.CompilerError err in generator.Errors)
-				Console.Error.WriteLine ("{0}({1},{2}): {3} {4}", err.FileName, err.Line, err.Column,
-				                   err.IsWarning? "WARNING" : "ERROR", err.ErrorText);
+
+			foreach (TemplateError err in generator.Errors) {
+				Console.Error.WriteLine ("{0}({1},{2}): {3} {4}", err.Location.FileName, err.Location.Line, err.Location.Column,
+								   err.IsWarning ? "WARNING" : "ERROR", err.Message);
+			}
 			
 			return generator.Errors.HasErrors? -1 : 0;
 		}

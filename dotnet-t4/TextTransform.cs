@@ -201,7 +201,7 @@ namespace Mono.TextTemplating
 			}
 
 			if (pt.Errors.Count > 0) {
-				generator.Errors.AddRange (pt.Errors.ToCompilerErrorCollection());
+				generator.Errors.AddRange (pt.Errors);
 			}
 
 			string outputContent = null;
@@ -264,10 +264,9 @@ namespace Mono.TextTemplating
 						}
 
 						generator.Errors.Add (
-							new CompilerError (
-								null, 0, 0, null,
-								$"Could not convert property '{p.Key}'='{p.Value}' to parameter type '{typeName}'"
-							)
+							new TemplateError (
+								$"Could not convert property '{p.Key}'='{p.Value}' to parameter type '{typeName}'",
+								new Location ())
 						);
 					}
 				}
@@ -325,26 +324,26 @@ namespace Mono.TextTemplating
 
 		static void LogErrors (TemplateGenerator generator)
 		{
-			foreach (System.CodeDom.Compiler.CompilerError err in generator.Errors) {
+			foreach (TemplateError err in generator.Errors) {
 				var oldColor = Console.ForegroundColor;
 				Console.ForegroundColor = err.IsWarning? ConsoleColor.Yellow : ConsoleColor.Red;
-				if (!string.IsNullOrEmpty (err.FileName)) {
-					Console.Error.Write (err.FileName);
+				if (!string.IsNullOrEmpty (err.Location.FileName)) {
+					Console.Error.Write (err.Location.FileName);
 				}
-				if (err.Line > 0) {
+				if (err.Location.Line > 0) {
 					Console.Error.Write ("(");
-					Console.Error.Write (err.Line);
-					if (err.Column > 0) {
+					Console.Error.Write (err.Location.Line);
+					if (err.Location.Column > 0) {
 						Console.Error.Write (",");
-						Console.Error.Write (err.Column);
+						Console.Error.Write (err.Location.Column);
 					}
 					Console.Error.Write (")");
 				}
-				if (!string.IsNullOrEmpty (err.FileName) || err.Line > 0) {
+				if (!string.IsNullOrEmpty (err.Location.FileName) || err.Location.Line > 0) {
 					Console.Error.Write (": ");
 				}
 				Console.Error.Write (err.IsWarning ? "WARNING: " : "ERROR: ");
-				Console.Error.WriteLine (err.ErrorText);
+				Console.Error.WriteLine (err.Message);
 				Console.ForegroundColor = oldColor;
 			}
 		}

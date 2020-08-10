@@ -1,5 +1,5 @@
 // 
-// TemplateError.cs
+// TemplateErrorUtil.cs
 //  
 // Author:
 //       Kenneth Carter <kccarter32@gmail.com>
@@ -26,43 +26,24 @@
 
 using System;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
-using System.Text;
-using Mono.TextTemplating;
 
-namespace Mono.VisualStudio.TextTemplating.VSHost
+namespace Mono.TextTemplating
 {
-	[Serializable]
-	public class TemplateError
+	public static class TemplateErrorUtil
 	{
-		public TemplateError () { }
-
-		public TemplateError(string message, Location location)
-			: this(message, string.Empty, location, false)
-		{ }
-
-		public TemplateError (string message, string errorNumber, Location location)
-			: this (message, errorNumber, location, false)
-		{ }
-
-		public TemplateError (string message, string errorNumber, Location location, bool isWarning)
+		public static TemplateErrorCollection ToTemplateErrorCollection(this CompilerErrorCollection errors)
 		{
-			Message = message;
-			ErrorNumber = errorNumber;
-			Location = location;
-			IsWarning = isWarning;
-		}
+			if (errors == null) {
+				throw new ArgumentNullException (nameof (errors));
+			}
 
-		public string ErrorNumber { get; set; }
-		public string Message { get; set; }
-		public Location Location { get; set; }
-		public bool IsWarning { get; set; }
+			var templateErrors = new TemplateErrorCollection ();
 
-		public CompilerError ToCompilerError()
-		{
-			return new CompilerError (Location.FileName, Location.Line, Location.Column, ErrorNumber, Message) {
-				IsWarning = IsWarning
-			};
+			foreach(CompilerError error in errors) {
+				templateErrors.Add (new TemplateError (error.ErrorText, error.ErrorNumber, new Location (error.FileName, error.Line, error.Column), error.IsWarning));
+			}
+
+			return templateErrors;
 		}
 	}
 }

@@ -36,6 +36,8 @@ using System.Threading;
 using Microsoft.CSharp;
 using Mono.VisualStudio.TextTemplating;
 using System.Globalization;
+using System.Security.Cryptography.X509Certificates;
+using Mono.VisualStudio.TextTemplating.VSHost;
 #if FEATURE_ROSLYN
 using Mono.TextTemplating.CodeCompilation;
 #endif
@@ -95,7 +97,7 @@ namespace Mono.TextTemplating
 
 			var pt = ParsedTemplate.FromText (content, host);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
+				host.LogErrors (pt.Errors);
 				return null;
 			}
 			return PreprocessTemplateInternal (pt, content, host, className, classNamespace, out language, out references);
@@ -124,7 +126,7 @@ namespace Mono.TextTemplating
 
 			settings = settings ?? GetSettings (host, pt);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
+				host.LogErrors (pt.Errors);
 				return null;
 			}
 			settings.Name = className;
@@ -136,7 +138,7 @@ namespace Mono.TextTemplating
 			var ccu = GenerateCompileUnit (host, content, pt, settings);
 			references = ProcessReferences (host, pt, settings).ToArray ();
 
-			host.LogErrors (pt.Errors.ToCompilerErrorCollection());
+			host.LogErrors (pt.Errors);
 			if (pt.Errors.HasErrors) {
 				return null;
 			}
@@ -157,7 +159,7 @@ namespace Mono.TextTemplating
 
 			var pt = ParsedTemplate.FromText (content, host);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
+				host.LogErrors (pt.Errors);
 				return null;
 			}
 
@@ -186,7 +188,7 @@ namespace Mono.TextTemplating
 		{
 			settings = settings ?? GetSettings (host, pt);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
+				host.LogErrors (pt.Errors);
 				return null;
 			}
 
@@ -201,14 +203,14 @@ namespace Mono.TextTemplating
 			var ccu = GenerateCompileUnit (host, content, pt, settings);
 			var references = ProcessReferences (host, pt, settings);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
+				host.LogErrors (pt.Errors);
 				return null;
 			}
 
 			var results = CompileCode (references, settings, ccu);
 			if (results.Errors.HasErrors) {
-				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
-				host.LogErrors (results.Errors);
+				host.LogErrors (pt.Errors);
+				host.LogErrors (results.Errors.ToTemplateErrorCollection());
 				return null;
 			}
 

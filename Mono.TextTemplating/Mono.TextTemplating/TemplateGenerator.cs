@@ -32,6 +32,7 @@ using System.Reflection;
 using System.Text;
 using Mono.VisualStudio.TextTemplating;
 using System.Runtime.Serialization;
+using Mono.VisualStudio.TextTemplating.VSHost;
 
 namespace Mono.TextTemplating
 {
@@ -63,7 +64,7 @@ namespace Mono.TextTemplating
 		Encoding encoding;
 
 		//host properties for consumers to access
-		public CompilerErrorCollection Errors { get; } = new CompilerErrorCollection ();
+		public TemplateErrorCollection Errors { get; } = new TemplateErrorCollection ();
 		public List<string> Refs { get; } = new List<string> ();
 		public List<string> Imports { get; } = new List<string> ();
 		public List<string> IncludePaths { get; } = new List<string> ();
@@ -188,9 +189,9 @@ namespace Mono.TextTemplating
 		
 		CompilerError AddError (string error)
 		{
-			var err = new CompilerError { ErrorText = error };
+			var err = new TemplateError () { Message = error };
 			Errors.Add (err);
-			return err;
+			return err.ToCompilerError();
 		}
 		
 		#region Virtual members
@@ -391,9 +392,9 @@ namespace Mono.TextTemplating
 			return LoadIncludeText (requestFileName, out content, out location);
 		}
 		
-		void ITextTemplatingEngineHost.LogErrors (CompilerErrorCollection errors)
+		void ITextTemplatingEngineHost.LogErrors (TemplateErrorCollection errors)
 		{
-			this.Errors.AddRange (errors);
+			Errors.AddRange (errors);
 		}
 		
 		string ITextTemplatingEngineHost.ResolveAssemblyReference (string assemblyReference)

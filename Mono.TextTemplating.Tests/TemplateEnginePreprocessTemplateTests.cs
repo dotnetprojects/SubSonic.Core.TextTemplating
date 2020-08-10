@@ -88,7 +88,7 @@ namespace Mono.TextTemplating.Tests
 			
 			TemplatingEngine engine = new TemplatingEngine ();
 			string output = engine.PreprocessTemplate (input, host, className, classNamespace, out language, out references);
-			ReportErrors (host.Errors);
+			ReportErrors (host.Errors.ToCompilerErrorCollection());
 			if (output != null) {
 				return TemplatingEngineHelper.CleanCodeDom (output, "\n");
 			}

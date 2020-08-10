@@ -76,7 +76,7 @@ namespace Mono.TextTemplating
 				pt.LogError (string.Format (CultureInfo.CurrentCulture, VsTemplatingErrorResources.ExceptionProcessingTemplate, ex), new Location (host.TemplateFile, -1, -1));
 			}
 			finally {
-				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
+				host.LogErrors (pt.Errors);
 			}
 
 			return run;

@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.CodeDom.Compiler;
 using Mono.VisualStudio.TextTemplating;
+using Mono.VisualStudio.TextTemplating.VSHost;
 
 namespace Mono.TextTemplating.Tests
 {
@@ -39,7 +40,7 @@ namespace Mono.TextTemplating.Tests
 		public readonly Dictionary<string, object> HostOptions = new Dictionary<string, object> ();
 	 	List<string> standardAssemblyReferences = new List<string> ();
 		List<string> standardImports = new List<string> ();
-		public readonly CompilerErrorCollection Errors = new CompilerErrorCollection ();
+		public readonly TemplateErrorCollection Errors = new TemplateErrorCollection ();
 		public readonly Dictionary<string, Type> DirectiveProcessors = new Dictionary<string, Type> ();
 		
 		public virtual object GetHostOption (string optionName)
@@ -56,7 +57,7 @@ namespace Mono.TextTemplating.Tests
 				&& Contents.TryGetValue (requestFileName, out content);
 		}
 		
-		public virtual void LogErrors (CompilerErrorCollection errors)
+		public virtual void LogErrors (TemplateErrorCollection errors)
 		{
 			Errors.AddRange (errors);
 		}

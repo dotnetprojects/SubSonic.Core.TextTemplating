@@ -77,7 +77,7 @@ namespace Mono.TextTemplating.Tests
 			var gen = new TemplateGenerator ();
 			string tmp = null;
 			gen.ProcessTemplate (null, "<#@ include file=\"none.tt\" #>", ref tmp, out tmp);
-			Assert.IsTrue (gen.Errors.OfType<CompilerError> ().First ().ErrorText
+			Assert.IsTrue (gen.Errors.OfType<TemplateError> ().First ().Message
 				.StartsWith ("Could not read included file 'none.tt'"));
 		}
 
@@ -136,7 +136,7 @@ namespace Mono.TextTemplating.Tests
 		{
 			var pt = ParsedTemplate.FromText (content, host);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
+				host.LogErrors (pt.Errors);
 				return null;
 			}
 			
@@ -144,13 +144,13 @@ namespace Mono.TextTemplating.Tests
 			if (name != null)
 				settings.Namespace = name;
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
+				host.LogErrors (pt.Errors);
 				return null;
 			}
 			
 			var ccu = TemplatingEngine.GenerateCompileUnit (host, content, pt, settings);
 			if (pt.Errors.HasErrors) {
-				host.LogErrors (pt.Errors.ToCompilerErrorCollection());
+				host.LogErrors (pt.Errors);
 				return null;
 			}
 			
