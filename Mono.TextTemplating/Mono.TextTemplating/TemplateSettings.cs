@@ -58,14 +58,15 @@ namespace Mono.TextTemplating
 #if !NET35
 		public RuntimeKind RuntimeKind { get; set; }
 #endif
-		public TextWriter Log { get; set; }
+		[NonSerialized]
+		TextWriter logWriter;
+		public TextWriter Log { get => logWriter; set => logWriter = value; }
 		public string Inherits { get; set; }
 		public string Name { get; set; }
 		public string Namespace { get; set; }
 		public HashSet<string> Imports { get; private set; }
 		public HashSet<string> Assemblies { get; private set; }
 		public Dictionary<string, string> CodeProviderOptions { get; private set; }
-		//public System.CodeDom.Compiler.CodeDomProvider Provider { get; set; }
 		public string Language { get; set; }
 		public string CompilerOptions { get; set; }
 		public Encoding Encoding { get; set; }
