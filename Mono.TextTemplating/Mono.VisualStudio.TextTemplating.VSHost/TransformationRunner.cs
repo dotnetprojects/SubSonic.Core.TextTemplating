@@ -300,7 +300,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		protected void LogError(string message, bool isWarning)
 		{
-			Errors.Add (new TemplateError (message, new Location (Host.TemplateFile)) {
+			Errors.Add (new TemplateError (message, new Location (Host?.TemplateFile ?? string.Empty)) {
 				IsWarning = isWarning
 			});
 		}
