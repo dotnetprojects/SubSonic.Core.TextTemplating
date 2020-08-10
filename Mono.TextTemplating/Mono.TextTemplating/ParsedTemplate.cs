@@ -209,7 +209,8 @@ namespace Mono.TextTemplating
 		Location EndLocation { get; set; }
 		Location TagStartLocation {get; set; }
 	}
-	
+
+	[Serializable]
 	public class TemplateSegment : ISegment
 	{
 		public TemplateSegment (SegmentType type, string text, Location start)
@@ -225,7 +226,8 @@ namespace Mono.TextTemplating
 		public Location StartLocation { get; private set; }
 		public Location EndLocation { get; set; }
 	}
-	
+
+	[Serializable]
 	public class Directive : ISegment
 	{
 		public Directive (string name, Location start)
