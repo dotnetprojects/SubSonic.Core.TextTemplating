@@ -3,6 +3,9 @@
 //  
 // Author:
 //       Nathan Baulch <nathan.baulch@gmail.com>
+//
+// Modified By:
+//       Kenneth Carter <kccarter32@gmail.com>
 // 
 // Copyright (c) 2009 Nathan Baulch
 // 
