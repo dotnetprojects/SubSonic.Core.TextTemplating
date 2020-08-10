@@ -94,8 +94,6 @@ namespace Mono.TextTemplating
 				if (runner != null && !runner.Errors.HasErrors) {
 					ProcessReferences (host, pt, settings);
 					if (!pt.Errors.HasErrors) {
-						//with app domains dissappearing we may not be able to pre load anything
-						//runner.PreLoadAssemblies (settings.Assemblies);
 						try {
 							success = runFactory.PrepareTransformation (runner.RunnerId, pt, content, settings.HostSpecific ? host : null, settings);
 						}
@@ -112,12 +110,13 @@ namespace Mono.TextTemplating
 				}
 				pt.LogError (ex.ToString (), new Location (host.TemplateFile, -1, -1));
 			}
-			finally {
-				if (runner != null) {
-					pt.Errors.AddRange (runner.Errors);
-					runner.ClearErrors ();
-				}
-			}
+			//finally {
+			//	if (runner != null) {
+			//		// using RPC this will not be possible
+			//		pt.Errors.AddRange (runner.Errors.ToCompilerErrorCollection());
+			//		runner.ClearErrors ();
+			//	}
+			//}
 
 			return success ? runner : null;
 		}

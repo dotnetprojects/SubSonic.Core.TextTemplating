@@ -265,7 +265,8 @@ namespace Mono.TextTemplating
 		Content,
 		Helper
 	}
-	
+
+	[Serializable]
 	public struct Location : IEquatable<Location>
 	{
 		public Location (string fileName, int line, int column) : this()

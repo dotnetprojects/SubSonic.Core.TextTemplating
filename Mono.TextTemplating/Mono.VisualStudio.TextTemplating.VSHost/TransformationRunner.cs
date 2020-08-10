@@ -1,5 +1,6 @@
 using System;
 using System.CodeDom.Compiler;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
@@ -22,14 +23,14 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		protected TemplateSettings Settings { get; private set; }
 		protected ITextTemplatingEngineHost Host { get; private set; }
 
-		public CompilerErrorCollection Errors { get; private set; }
+		public TemplateErrorCollection Errors { get; private set; }
 
 		public TransformationRunner(TransformationRunFactory factory, Guid id)
 		{
 			Factory = factory ?? throw new ArgumentNullException (nameof (factory)); // this tags the runner with the run factory
 			RunnerId = id;
 
-			Errors = new CompilerErrorCollection();
+			Errors = new TemplateErrorCollection ();
 		}
 
 #if NETSTANDARD
@@ -299,25 +300,16 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		protected void LogError(string message, bool isWarning)
 		{
-			CompilerError error = new CompilerError () {
-				ErrorText = message,
+			Errors.Add (new TemplateError (message, new Location (Host.TemplateFile)) {
 				IsWarning = isWarning
-			};
-
-			Errors.Add (error);
+			});
 		}
 
 		protected void LogError(string message, bool isWarning, string filename, int line, int column)
 		{
-			CompilerError error = new CompilerError () {
-				ErrorText = message,
-				IsWarning = isWarning,
-				FileName = filename,
-				Line = line,
-				Column = column
-			};
-
-			Errors.Add (error);
+			Errors.Add (new TemplateError (message, new Location (filename, line, column)) {
+				IsWarning = isWarning
+			});
 		}
 	}
 }
