@@ -116,9 +116,8 @@ namespace Mono.VisualStudio.TextTemplating
 		/// <summary>
 		/// instanciate process runner
 		/// </summary>
-		/// <param name="runnerType">type of runner to instanciate</param>
 		/// <returns></returns>
-		IProcessTransformationRunner CreateTransformationRunner (Type runnerType);
+		IProcessTransformationRunner CreateTransformationRunner ();
 		/// <summary>
 		/// We have no further need for the runner.
 		/// </summary>

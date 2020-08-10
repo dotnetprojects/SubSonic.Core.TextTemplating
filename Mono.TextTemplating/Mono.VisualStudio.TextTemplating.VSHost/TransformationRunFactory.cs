@@ -8,7 +8,7 @@ using Mono.TextTemplating;
 namespace Mono.VisualStudio.TextTemplating.VSHost
 {
 	[Serializable]
-	public class TransformationRunFactory
+	public abstract class TransformationRunFactory
 		: IProcessTransformationRunFactory
 	{
 #if !NET35
@@ -46,22 +46,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		/// <summary>
 		/// Create the transformation runner
 		/// </summary>
-		/// <param name="runnerType"></param>
-		/// <returns></returns>
-		public virtual IProcessTransformationRunner CreateTransformationRunner (Type runnerType)
-		{
-			var runnerId = Guid.NewGuid ();
-#if !NET35
-			if (Activator.CreateInstance (runnerType, new object[] { this, runnerId }) is IProcessTransformationRunner runner) {
-				if (Runners.TryAdd (runnerId, runner)) {
-					return runner;
-				}
-			}
-			return default;
-#else
-			throw new PlatformNotSupportedException ();
-#endif
-		}
+		/// <returns>instanciated transformation runner</returns>
+		public abstract IProcessTransformationRunner CreateTransformationRunner ();
 
 		public virtual bool PrepareTransformation (Guid runnerId, ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings)
 		{
@@ -72,7 +58,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			}
 			return default;
 #else
-			throw new PlatformNotSupportedException ();
+			throw new NotSupportedException ();
 #endif
 		}
 		/// <summary>
