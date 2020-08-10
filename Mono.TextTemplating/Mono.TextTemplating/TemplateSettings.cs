@@ -82,6 +82,11 @@ namespace Mono.TextTemplating
 
 		public string GetFullName () => string.IsNullOrEmpty (Namespace) ? Name : Namespace + "." + Name;
 
+		public void SetAssemblies(IEnumerable<string> assemblies)
+		{
+			Assemblies = new HashSet<string> (assemblies);
+		}
+
 		public CodeDomProvider GetCodeDomProvider()
 		{
 #if !NET35

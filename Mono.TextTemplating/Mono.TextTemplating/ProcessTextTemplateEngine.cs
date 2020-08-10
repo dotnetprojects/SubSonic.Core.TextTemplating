@@ -116,7 +116,8 @@ namespace Mono.TextTemplating
 					pt.LogError (ex.ToString (), new Location (host.TemplateFile));
 				}
 				if (runner != null && !runner.Errors.HasErrors) {
-					ProcessReferences (host, pt, settings);
+					// reference the assemblies and ensure they are path rooted
+					settings.SetAssemblies(ProcessReferences (host, pt, settings));
 					if (!pt.Errors.HasErrors) {
 						try {
 							success = runFactory.PrepareTransformation (runner.RunnerId, pt, content, settings.HostSpecific ? host : null, settings);

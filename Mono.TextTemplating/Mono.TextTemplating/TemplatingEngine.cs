@@ -355,14 +355,15 @@ namespace Mono.TextTemplating
 			var resolved = new Dictionary<string, string> ();
 
 			foreach (string assem in settings.Assemblies.Union (host.StandardAssemblyReferences)) {
-				if (resolved.Values.Contains (assem))
+				if (resolved.Values.Contains (assem)) {
 					continue;
-
+				}
 				string resolvedAssem = host.ResolveAssemblyReference (assem);
 				if (!string.IsNullOrEmpty (resolvedAssem)) {
 					var assemblyName = resolvedAssem;
-					if (File.Exists (resolvedAssem))
+					if (File.Exists (resolvedAssem)) {
 						assemblyName = AssemblyName.GetAssemblyName (resolvedAssem).FullName;
+					}
 					resolved [assemblyName] = resolvedAssem;
 				} else {
 					pt.LogError ("Could not resolve assembly reference '" + assem + "'");
