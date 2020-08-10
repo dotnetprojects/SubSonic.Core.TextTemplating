@@ -145,8 +145,7 @@ namespace Mono.VisualStudio.TextTemplating
 	public interface IProcessTextTemplatingEngine
 		: ITextTemplatingEngine
 	{
-		IProcessTransformationRunner PrepareTransformationRunner<TTransformationRunner>(string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, bool debugging = false)
-			where TTransformationRunner : class;
+		IProcessTransformationRunner PrepareTransformationRunner (string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, bool debugging = false);
 
 		CompiledTemplate CompileTemplate (string content, ITextTemplatingEngineHost host);
 

@@ -13,11 +13,10 @@ namespace Mono.TextTemplating
 	public partial class TemplatingEngine
 		: IProcessTextTemplatingEngine
 	{
-		public IProcessTransformationRunner PrepareTransformationRunner<TTransformationRunner>(string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, bool debugging = false)
-			where TTransformationRunner: class
+		public IProcessTransformationRunner PrepareTransformationRunner (string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, bool debugging = false)
 		{
 			if (content == null) {
-				throw new ArgumentNullException (nameof(content));
+				throw new ArgumentNullException (nameof (content));
 			}
 			if (host == null) {
 				throw new ArgumentNullException (nameof (host));
@@ -44,12 +43,13 @@ namespace Mono.TextTemplating
 
 				settings.Debug = debugging;
 
-				run = CompileAndPrepareRun<TTransformationRunner> (pt, content, host, runFactory, settings);
-			} catch(Exception ex) {
-				if (IsCriticalException(ex)) {
+				run = CompileAndPrepareRun (pt, content, host, runFactory, settings);
+			}
+			catch (Exception ex) {
+				if (IsCriticalException (ex)) {
 					throw;
 				}
-				pt.LogError (string.Format(CultureInfo.CurrentCulture, VsTemplatingErrorResources.ExceptionProcessingTemplate, ex), new Location (host.TemplateFile, -1, -1));
+				pt.LogError (string.Format (CultureInfo.CurrentCulture, VsTemplatingErrorResources.ExceptionProcessingTemplate, ex), new Location (host.TemplateFile, -1, -1));
 			}
 			finally {
 				host.LogErrors (pt.Errors);
@@ -58,8 +58,7 @@ namespace Mono.TextTemplating
 			return run;
 		}
 
-		protected virtual IProcessTransformationRunner CompileAndPrepareRun<TTransformationRunner>(ParsedTemplate pt, string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, TemplateSettings settings)
-			where TTransformationRunner: class
+		protected virtual IProcessTransformationRunner CompileAndPrepareRun (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, TemplateSettings settings)
 		{
 			TransformationRunner runner = null;
 			bool success = false;
@@ -82,7 +81,7 @@ namespace Mono.TextTemplating
 
 			try {
 				try {
-					if (runFactory.CreateTransformationRunner (typeof (TTransformationRunner)) is TransformationRunner theRunner) {
+					if (runFactory.CreateTransformationRunner () is TransformationRunner theRunner) {
 						runner = theRunner;
 					}
 				}
@@ -107,7 +106,7 @@ namespace Mono.TextTemplating
 					}
 				}
 			}
-			catch(Exception ex) {
+			catch (Exception ex) {
 				if (IsCriticalException (ex)) {
 					throw;
 				}
@@ -123,7 +122,7 @@ namespace Mono.TextTemplating
 			return success ? runner : null;
 		}
 
-		public static bool IsCriticalException(Exception e)
+		public static bool IsCriticalException (Exception e)
 		{
 			return ((e is StackOverflowException) || ((e is OutOfMemoryException) || ((e is ThreadAbortException) || ((e.InnerException != null) && IsCriticalException (e.InnerException)))));
 		}
