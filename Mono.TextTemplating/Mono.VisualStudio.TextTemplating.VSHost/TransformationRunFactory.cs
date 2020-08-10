@@ -26,7 +26,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public TransformationRunFactory (Guid id)
 		{
-			FactoryId = id;
+			this.id = id;
 
 			engine = new TemplatingEngine ();
 		}
@@ -35,12 +35,13 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public IProcessTextTemplatingEngine Engine { get => engine; }
 
+		public Guid GetFactoryId () => id;
 		/// <summary>
 		/// get the status of this instance.
 		/// </summary>
-		public bool IsAlive { get => !FactoryId.Equals (Guid.Empty); }
+		public bool IsRunFactoryAlive () => !id.Equals (Guid.Empty);
 
-		public Guid FactoryId { get; private set; }
+
 
 		/// <summary>
 		/// Create the transformation runner

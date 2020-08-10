@@ -104,13 +104,15 @@ namespace Mono.VisualStudio.TextTemplating
 	public interface IProcessTransformationRunFactory
 	{
 		/// <summary>
-		/// Get the Factory ID
+		/// Get the factory id
 		/// </summary>
-		Guid FactoryId { get; }
+		/// <returns>returns the run factory identifier</returns>
+		Guid GetFactoryId ();
 		/// <summary>
-		/// Run Factory is alive and ready
+		/// Check to determine that the run factory is up and running
 		/// </summary>
-		bool IsAlive { get; }
+		/// <returns>true, if factory is ready to process.</returns>
+		bool IsRunFactoryAlive ();
 		/// <summary>
 		/// instanciate process runner
 		/// </summary>
