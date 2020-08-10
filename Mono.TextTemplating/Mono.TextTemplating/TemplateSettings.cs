@@ -53,7 +53,6 @@ namespace Mono.TextTemplating
 		public bool Debug { get; set; }
 		public bool CachedTemplates { get; set; }
 #if !NET35
-		public CancellationToken CancellationToken { get; set; }
 		public RuntimeKind RuntimeKind { get; set; }
 #endif
 		public TextWriter Log { get; set; }

@@ -262,7 +262,7 @@ namespace Mono.TextTemplating
 			args.OutputPath = Path.Combine (tempFolder, settings.Name + ".dll");
 			args.TempDirectory = tempFolder;
 
-			var result = compiler.CompileFile (args, settings.Log, settings.CancellationToken).Result;
+			var result = compiler.CompileFile (args, settings.Log, CancellationToken.None).Result;
 
 			var r = new CompilerResults (new TempFileCollection ());
 			r.TempFiles.AddFile (sourceFilename, false);
@@ -522,13 +522,6 @@ namespace Mono.TextTemplating
 			}
 
 #if !NET35
-			if (host.GetHostOption (nameof (TemplateSettings.CancellationToken)) is CancellationToken cancellationToken) {
-				settings.CancellationToken = cancellationToken;
-			}
-			else {
-				settings.CancellationToken = CancellationToken.None;
-			}
-
 			if ((host.GetHostOption (nameof (TemplateSettings.RuntimeKind)) ?? RuntimeKind.Default) is RuntimeKind runtimeKind) {
 				settings.RuntimeKind = runtimeKind;
 			}
