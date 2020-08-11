@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -35,18 +36,16 @@ using Mono.TextTemplating.CodeCompilation;
 
 namespace Mono.VisualStudio.TextTemplating
 {
+	[Serializable]
 	public sealed class ParameterDirectiveProcessor : DirectiveProcessor, IRecognizeHostSpecific
-	{
-		CodeDomProvider provider;
-		
+	{		
 		bool hostSpecific;
 		readonly List<CodeStatement> postStatements = new List<CodeStatement> ();
 		readonly List<CodeTypeMember> members = new List<CodeTypeMember> ();
 		
-		public override void StartProcessingRun (CodeDomProvider languageProvider, string templateContents, CompilerErrorCollection errors)
+		public override void StartProcessingRun (string templateContents, CompilerErrorCollection errors)
 		{
-			base.StartProcessingRun (languageProvider, templateContents, errors);
-			provider = languageProvider;
+			base.StartProcessingRun (templateContents, errors);
 			postStatements.Clear ();
 			members.Clear ();
 		}
@@ -67,17 +66,21 @@ namespace Mono.VisualStudio.TextTemplating
 		
 		public override string GetClassCodeForProcessingRun ()
 		{
-			return TemplatingEngine.GenerateIndentedClassCode (provider, members);
+			using (CodeDomProvider provider = Settings.GetCodeDomProvider ()) {
+				return TemplatingEngine.GenerateIndentedClassCode (provider, members);
+			}
 		}
 		
 		public override string[] GetImportsForProcessingRun ()
 		{
 			return null;
 		}
-		
+
 		public override string GetPostInitializationCodeForProcessingRun ()
 		{
-			return TemplatingEngine.IndentSnippetText (provider, StatementsToCode (postStatements), "            ");
+			using (CodeDomProvider provider = Settings.GetCodeDomProvider ()) {
+				return TemplatingEngine.IndentSnippetText (provider, StatementsToCode (postStatements), "            ");
+			}
 		}
 		
 		public override string GetPreInitializationCodeForProcessingRun ()
@@ -87,11 +90,14 @@ namespace Mono.VisualStudio.TextTemplating
 		
 		string StatementsToCode (List<CodeStatement> statements)
 		{
-			var options = new CodeGeneratorOptions ();
-			using (var sw = new StringWriter ()) {
-				foreach (var statement in statements)
-					provider.GenerateCodeFromStatement (statement, sw, options);
-				return sw.ToString ();
+			using (CodeDomProvider provider = Settings.GetCodeDomProvider ()) {
+				var options = new CodeGeneratorOptions ();
+				using (var sw = new StringWriter ()) {
+					foreach (var statement in statements) {
+						provider.GenerateCodeFromStatement (statement, sw, options);
+					}
+					return sw.ToString ();
+				}
 			}
 		}
 		

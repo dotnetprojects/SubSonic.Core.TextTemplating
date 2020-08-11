@@ -49,12 +49,8 @@ namespace Mono.VisualStudio.TextTemplating
 			this.Settings = settings ?? throw new ArgumentNullException (nameof (settings));
 		}
 		
-		public virtual void StartProcessingRun (CodeDomProvider languageProvider, string templateContents, CompilerErrorCollection errors)
+		public virtual void StartProcessingRun (string templateContents, CompilerErrorCollection errors)
 		{
-			if (languageProvider == null) {
-				throw new ArgumentNullException (nameof (languageProvider));
-			}
-
 			this.errors = errors;
 		}
 		

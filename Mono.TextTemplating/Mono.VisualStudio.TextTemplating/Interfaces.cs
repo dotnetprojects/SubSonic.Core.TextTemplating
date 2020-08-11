@@ -231,6 +231,6 @@ namespace Mono.VisualStudio.TextTemplating
 		bool IsDirectiveSupported (string directiveName);
 		void ProcessDirective (string directiveName, IDictionary<string, string> arguments);
 		void SetProcessingRunIsHostSpecific (bool hostSpecific);
-		void StartProcessingRun (CodeDomProvider languageProvider, string templateContents, CompilerErrorCollection errors);
+		void StartProcessingRun (string templateContents, CompilerErrorCollection errors);
 	}
 }

@@ -640,26 +640,25 @@ namespace Mono.TextTemplating
 
 		static void ProcessDirectives (string content, ParsedTemplate pt, TemplateSettings settings)
 		{
-			using (CodeDomProvider provider = settings.GetCodeDomProvider ()) {
-				foreach (var processor in settings.DirectiveProcessors.Values) {
-					processor.StartProcessingRun (provider, content, pt.Errors.ToCompilerErrorCollection ());
-				}
 
-				foreach (var dt in settings.CustomDirectives) {
-					var processor = settings.DirectiveProcessors[dt.ProcessorName];
-					processor.ProcessDirective (dt.Directive.Name, dt.Directive.Attributes);
-				}
+			foreach (var processor in settings.DirectiveProcessors.Values) {
+				processor.StartProcessingRun (content, pt.Errors.ToCompilerErrorCollection ());
+			}
 
-				foreach (var processor in settings.DirectiveProcessors.Values) {
-					processor.FinishProcessingRun ();
+			foreach (var dt in settings.CustomDirectives) {
+				var processor = settings.DirectiveProcessors[dt.ProcessorName];
+				processor.ProcessDirective (dt.Directive.Name, dt.Directive.Attributes);
+			}
 
-					var imports = processor.GetImportsForProcessingRun ();
-					if (imports != null)
-						settings.Imports.UnionWith (imports);
-					var references = processor.GetReferencesForProcessingRun ();
-					if (references != null)
-						settings.Assemblies.UnionWith (references);
-				}
+			foreach (var processor in settings.DirectiveProcessors.Values) {
+				processor.FinishProcessingRun ();
+
+				var imports = processor.GetImportsForProcessingRun ();
+				if (imports != null)
+					settings.Imports.UnionWith (imports);
+				var references = processor.GetReferencesForProcessingRun ();
+				if (references != null)
+					settings.Assemblies.UnionWith (references);
 			}
 		}
 

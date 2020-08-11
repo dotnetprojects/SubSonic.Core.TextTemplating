@@ -41,7 +41,6 @@ namespace Mono.VisualStudio.TextTemplating
 		StringBuilder preInitBuffer = new StringBuilder ();
 		StringBuilder postInitBuffer = new StringBuilder ();
 		StringBuilder codeBuffer = new StringBuilder ();
-		CodeDomProvider languageProvider;
 		
 		protected RequiresProvidesDirectiveProcessor ()
 		{
@@ -98,13 +97,12 @@ namespace Mono.VisualStudio.TextTemplating
 			return preInitBuffer.ToString ();
 		}
 		
-		public override void StartProcessingRun (CodeDomProvider languageProvider, string templateContents, CompilerErrorCollection errors)
+		public override void StartProcessingRun (string templateContents, CompilerErrorCollection errors)
 		{
 			AssertNotProcessing ();
 			isInProcessingRun = true;
-			base.StartProcessingRun (languageProvider, templateContents, errors);
+			base.StartProcessingRun (templateContents, errors);
 			
-			this.languageProvider = languageProvider;
 			codeBuffer.Length = 0;
 			preInitBuffer.Length = 0;
 			postInitBuffer.Length = 0;
@@ -178,10 +176,12 @@ namespace Mono.VisualStudio.TextTemplating
 			}
 			
 			PostProcessArguments (directiveName, requiresDictionary, providesDictionary);
-			
-			GeneratePreInitializationCode (directiveName, preInitBuffer, languageProvider, requiresDictionary, providesDictionary);
-			GeneratePostInitializationCode (directiveName, postInitBuffer, languageProvider, requiresDictionary, providesDictionary);
-			GenerateTransformCode (directiveName, codeBuffer, languageProvider, requiresDictionary, providesDictionary);
+
+			using (CodeDomProvider languageProvider = Settings.GetCodeDomProvider ()) {
+				GeneratePreInitializationCode (directiveName, preInitBuffer, languageProvider, requiresDictionary, providesDictionary);
+				GeneratePostInitializationCode (directiveName, postInitBuffer, languageProvider, requiresDictionary, providesDictionary);
+				GenerateTransformCode (directiveName, codeBuffer, languageProvider, requiresDictionary, providesDictionary);
+			}
 		}
 		
 		protected virtual string ProvideUniqueId (string directiveName, IDictionary<string, string> arguments,
