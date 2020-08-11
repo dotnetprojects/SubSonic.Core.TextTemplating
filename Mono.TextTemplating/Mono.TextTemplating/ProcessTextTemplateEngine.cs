@@ -120,7 +120,7 @@ namespace Mono.TextTemplating
 					settings.SetAssemblies(ProcessReferences (host, pt, settings));
 					if (!pt.Errors.HasErrors) {
 						try {
-							success = runFactory.PrepareTransformation (runner.RunnerId, pt, content, settings.HostSpecific ? host : null, settings);
+							success = runFactory.PrepareTransformation (runner.RunnerId, pt, content, host, settings);
 						}
 						catch (SerializationException) {
 							pt.LogError (VsTemplatingErrorResources.SessionHostMarshalError, new Location (host.TemplateFile));
