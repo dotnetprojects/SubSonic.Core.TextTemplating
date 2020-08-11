@@ -351,25 +351,36 @@ namespace Mono.TextTemplating
 			if (settings == null) {
 				throw new ArgumentNullException (nameof (settings));
 			}
-			
+
 			var resolved = new Dictionary<string, string> ();
 
-			foreach (string assem in settings.Assemblies.Union (host.StandardAssemblyReferences)) {
-				if (resolved.Values.Contains (assem)) {
+			foreach (string assembly in settings.Assemblies.Union (host.StandardAssemblyReferences)) {
+				if (resolved.Keys.Any(x => x.StartsWith(assembly, StringComparison.Ordinal))) {
+					continue;	// assembly has already been resolved
+				}
+
+				string
+					assemblyName = assembly,
+					referencePath = assembly;
+
+				if (Path.IsPathRooted(referencePath) && File.Exists(referencePath)) {
+					assemblyName = AssemblyName.GetAssemblyName (referencePath).FullName;
+					resolved[assemblyName] = referencePath;
 					continue;
 				}
-				string resolvedAssem = host.ResolveAssemblyReference (assem);
-				if (!string.IsNullOrEmpty (resolvedAssem)) {
-					var assemblyName = resolvedAssem;
-					if (File.Exists (resolvedAssem)) {
-						assemblyName = AssemblyName.GetAssemblyName (resolvedAssem).FullName;
-					}
-					resolved [assemblyName] = resolvedAssem;
-				} else if (!resolved.Keys.Any (x => x.StartsWith (resolvedAssem, StringComparison.OrdinalIgnoreCase))) {
-					pt.LogError ("Could not resolve assembly reference '" + assem + "'");
-					return null;
+
+				referencePath = host.ResolveAssemblyReference (assembly);
+
+				if (Path.IsPathRooted(referencePath) && File.Exists(referencePath)) {
+					assemblyName = AssemblyName.GetAssemblyName (referencePath).FullName;
+					resolved[assemblyName] = referencePath;
+					continue;
 				}
+
+				pt.LogError ("Could not resolve assembly reference '" + assembly + "'");
+				return null;
 			}
+
 			return resolved.Values.ToArray ();
 		}
 
