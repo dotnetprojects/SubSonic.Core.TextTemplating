@@ -51,6 +51,7 @@ namespace Mono.TextTemplating
 			DirectiveProcessors = new Dictionary<string, IDirectiveProcessor> ();
 			CodeProviderOptions = new Dictionary<string, string> ();
 			CultureId = CultureInfo.CurrentCulture.LCID;
+			CodePage = Encoding.UTF8.CodePage;
 		}
 		
 		public bool HostSpecific { get; set; }
@@ -71,7 +72,7 @@ namespace Mono.TextTemplating
 		public Dictionary<string, string> CodeProviderOptions { get; private set; }
 		public string Language { get; set; }
 		public string CompilerOptions { get; set; }
-		public string EncodingName { get; set; }
+		public int CodePage { get; set; }
 		public string Extension { get; set; }
 		public int CultureId { get; set; }
 		public List<CustomDirective> CustomDirectives { get; private set; }
@@ -92,7 +93,7 @@ namespace Mono.TextTemplating
 
 		public Encoding GetEncoding()
 		{
-			return Encoding.GetEncoding (EncodingName);
+			return Encoding.GetEncoding (CodePage);
 		}
 
 		public Type GetHostType()

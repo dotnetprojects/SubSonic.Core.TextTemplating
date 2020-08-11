@@ -43,6 +43,14 @@ namespace Mono.TextTemplating
 			errors = new ArrayList ();
 		}
 
+		public TemplateErrorCollection(IEnumerable<TemplateError> errors)
+			: this()
+		{
+			foreach(var error in errors) {
+				Add (error);
+			}
+		}
+
 		public bool HasErrors => this.Any ();
 
 		public int Count => errors.Count;

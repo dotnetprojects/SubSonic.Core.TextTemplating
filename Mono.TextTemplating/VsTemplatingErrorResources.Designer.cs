@@ -70,6 +70,15 @@ namespace Mono.TextTemplating {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} engine host does not derive from {1}..
+        /// </summary>
+        internal static string EngineHostNotSubClassOfProcessEngineHost {
+            get {
+                return ResourceManager.GetString("EngineHostNotSubClassOfProcessEngineHost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error initializing the transformation object..
         /// </summary>
         internal static string ErrorInitializingTransformationObject {

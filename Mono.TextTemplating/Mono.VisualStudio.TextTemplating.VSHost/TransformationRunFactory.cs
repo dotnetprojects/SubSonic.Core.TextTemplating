@@ -67,8 +67,6 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		/// </summary>
 		public bool IsRunFactoryAlive () => !id.Equals (Guid.Empty);
 
-
-
 		/// <summary>
 		/// Create the transformation runner
 		/// </summary>
@@ -92,7 +90,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		/// </summary>
 		/// <param name="runner"></param>
 		/// <returns></returns>
-		public string StartTransformation (Guid runnerId)
+		public ITextTemplatingCallback StartTransformation (Guid runnerId)
 		{
 #if !NET35
 			if (Runners.TryGetValue(runnerId, out IProcessTransformationRunner _runner) &&

@@ -125,11 +125,11 @@ namespace Mono.VisualStudio.TextTemplating
 		/// </summary>
 		/// <param name="runnerId">the runner id</param>
 		/// <returns>result of transformation run.</returns>
-		string StartTransformation (Guid runnerId);
+		ITextTemplatingCallback StartTransformation (Guid runnerId);
 		/// <summary>
 		/// Get all the errors that were logged by the transformation
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>returns the callback object</returns>
 		TemplateErrorCollection GetErrors (Guid runnerId);
 	}
 
@@ -165,14 +165,22 @@ namespace Mono.VisualStudio.TextTemplating
 
 	public interface ITextTemplatingCallback
 	{
-		bool Errors { get; set; }
+		TemplateErrorCollection Errors { get; }
 		string Extension { get; }
 		void ErrorCallback (bool warning, string message, int line, int column);
 		void SetFileExtension (string extension);
 		void SetOutputEncoding (Encoding encoding, bool fromOutputDirective);
 		ITextTemplatingCallback DeepCopy ();
 
-		Encoding OutputEncoding { get; }
+		int CodePage { get; }
+		string TemplateOutput { get; }
+
+		/// <summary>
+		/// Get the output encoding
+		/// </summary>
+		/// <returns></returns>
+		Encoding GetOutputEncoding ();
+		void SetTemplateOutput (string output);
 	}
 
 	public interface ITextTemplatingEngineHost

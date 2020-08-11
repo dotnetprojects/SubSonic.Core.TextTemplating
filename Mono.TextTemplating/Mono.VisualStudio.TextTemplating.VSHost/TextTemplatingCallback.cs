@@ -26,31 +26,50 @@
 
 using System;
 using System.Text;
+using Mono.TextTemplating;
 
 namespace Mono.VisualStudio.TextTemplating.VSHost
 {
+	[Serializable]
 	public class TextTemplatingCallback
 		: ITextTemplatingCallback
 	{
 		bool isFromOutputDirective;
+		readonly ITextTemplatingEngineHost engineHost;
 
-		public bool Errors { get; set; }
+		public TextTemplatingCallback()
+		{
+			Errors = new TemplateErrorCollection ();
+			CodePage = Encoding.UTF8.CodePage;
+		}
+
+		public TextTemplatingCallback (ITextTemplatingEngineHost engineHost)
+			: this()
+		{
+			this.engineHost = engineHost ?? throw new ArgumentNullException(nameof(engineHost));
+		}
+
+		public TemplateErrorCollection Errors { get; }
 
 		public string Extension { get; private set; } = null;
 
-		public Encoding OutputEncoding { get; private set; } = Encoding.UTF8;
+		public int CodePage { get; private set; }
+
+		public string TemplateOutput { get; private set; }
 
 		public void Initialize()
 		{
-			Errors = false;
 			Extension = null;
-			OutputEncoding = Encoding.UTF8;
 			isFromOutputDirective = false;
+
+			Errors.Clear ();
 		}
 
 		public void ErrorCallback (bool warning, string message, int line, int column)
 		{
-			Errors = true;
+			Errors.Add (new TemplateError (message, new Location (engineHost.TemplateFile, line, column)) {
+				IsWarning = warning
+			});
 		}
 
 		public void SetFileExtension (string extension)
@@ -63,14 +82,16 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			if (!isFromOutputDirective) {
 				if (fromOutputDirective) {
 					isFromOutputDirective = true;
-					OutputEncoding = encoding ?? throw new ArgumentNullException (nameof (encoding));
+					CodePage = encoding?.CodePage ?? throw new ArgumentNullException (nameof (encoding));
 				} else {
-					if ((OutputEncoding != null) && !ReferenceEquals (encoding, OutputEncoding)) {
-						OutputEncoding = Encoding.UTF8;
-					}
-					OutputEncoding = encoding;
+					CodePage = encoding?.CodePage ?? Encoding.UTF8.CodePage;
 				}
 			}
+		}
+
+		public void SetTemplateOutput (string output)
+		{
+			TemplateOutput = output;
 		}
 
 		public ITextTemplatingCallback DeepCopy ()
@@ -80,11 +101,22 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			if (Extension != null) {
 				callback.Extension = (string)Extension.Clone ();
 			}
-			if (OutputEncoding != null) {
-				callback.OutputEncoding = (Encoding)OutputEncoding.Clone ();
+
+			if (TemplateOutput != null) {
+				callback.TemplateOutput = (string)TemplateOutput.Clone ();
 			}
 
+			callback.CodePage = CodePage;
+
 			return callback;
+		}
+
+		public Encoding GetOutputEncoding ()
+		{
+			if (CodePage > 0) {
+				return Encoding.GetEncoding (CodePage);
+			}
+			return Encoding.UTF8;
 		}
 	}
 }

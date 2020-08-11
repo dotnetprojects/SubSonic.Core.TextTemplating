@@ -73,7 +73,7 @@ namespace Mono.TextTemplating
 		public string OutputFile { get; protected set; }
 		public string TemplateFile { get; protected set; }
 		public bool UseRelativeLinePragmas { get; set; }
-		
+
 		public TemplateGenerator ()
 		{
 			Refs.Add (typeof (TextTransformation).Assembly.Location);

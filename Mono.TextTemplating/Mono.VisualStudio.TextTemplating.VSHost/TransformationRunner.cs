@@ -48,7 +48,9 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		protected static CompiledTemplate CompiledTemplate { get => compiledTemplate; set => compiledTemplate = value; }
 		protected TemplateSettings Settings { get; private set; }
-		protected static ITextTemplatingEngineHost Host { get => host; private set => host = value; }
+#pragma warning disable CA1822 // Mark members as static
+		public ITextTemplatingEngineHost Host { get => host; private set => host = value; }
+#pragma warning restore CA1822 // Mark members as static
 
 		public TemplateErrorCollection Errors { get; private set; }
 
@@ -83,7 +85,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 				}
 			}
 
-			string filePath = Host.ResolveAssemblyReference ($"{assemblyName.Name}.dll");
+			string filePath = host.ResolveAssemblyReference ($"{assemblyName.Name}.dll");
 
 			if (System.IO.File.Exists (filePath)) {
 				return context.LoadFromAssemblyPath (filePath);
@@ -111,64 +113,67 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		}
 #endif
 
-		public virtual string PerformTransformation ()
+		public virtual ITextTemplatingCallback PerformTransformation ()
 		{
-			string errorOutput = VsTemplatingErrorResources.ErrorOutput;
+			if (host is ProcessEngineHost engineHost) {
+				string errorOutput = VsTemplatingErrorResources.ErrorOutput;
 
-			if (CompiledTemplate == null) {
-				LogError (VsTemplatingErrorResources.ErrorInitializingTransformationObject, false);
+				if (CompiledTemplate == null) {
+					LogError (VsTemplatingErrorResources.ErrorInitializingTransformationObject, false);
 
-				return errorOutput;
-			}
+					engineHost.SetTemplateOutput (errorOutput);
 
-			object transform = null;
+					return engineHost.Callback;
+				}
 
-			try {
+				object transform = null;
+
+				try {
 #if NETSTANDARD
-				if (CompiledTemplate.Load (this)) {
-					transform = CreateTextTransformation (Settings, Host, CompiledTemplate.Assembly);
+					if (CompiledTemplate.Load (this)) {
+						transform = CreateTextTransformation (Settings, Host, CompiledTemplate.Assembly);
 
-					CompiledTemplate.SetTextTemplatingEngineHost (Host);
+						CompiledTemplate.SetTextTemplatingEngineHost (Host);
 
-					return CompiledTemplate.Process (transform).Trim();
-				}
+						engineHost.SetTemplateOutput (CompiledTemplate.Process (transform).Trim ());
+					}
 #else
-				AppDomain.CurrentDomain.AssemblyResolve += ResolveReferencedAssemblies;
+					AppDomain.CurrentDomain.AssemblyResolve += ResolveReferencedAssemblies;
 
-				if (CompiledTemplate.Load ()) {
-					transform = CreateTextTransformation (Settings, Host, CompiledTemplate.Assembly);
+					if (CompiledTemplate.Load ()) {
+						transform = CreateTextTransformation (Settings, Host, CompiledTemplate.Assembly);
 
-					CompiledTemplate.SetTextTemplatingEngineHost (Host);
+						CompiledTemplate.SetTextTemplatingEngineHost (Host);
 
-					return CompiledTemplate.Process (transform);
-				}
+						engineHost.SetTemplateOutput (CompiledTemplate.Process (transform).Trim ());
+					}
 #endif
-
-
-			}
-			catch (Exception ex) {
-				if (TemplatingEngine.IsCriticalException (ex)) {
-					throw;
 				}
-				LogError (ex.ToString (), false);
-			}
-			finally {
+				catch (Exception ex) {
+					if (TemplatingEngine.IsCriticalException (ex)) {
+						throw;
+					}
+					engineHost.SetTemplateOutput (errorOutput);
+					LogError (ex.ToString (), false);
+				}
+				finally {
 
 #if NETSTANDARD
-				Unload ();
+					Unload ();
 #else
-				AppDomain.CurrentDomain.AssemblyResolve -= ResolveReferencedAssemblies;
+					AppDomain.CurrentDomain.AssemblyResolve -= ResolveReferencedAssemblies;
 #endif
+					engineHost.LogErrors (Errors);
 
-				if (transform is IDisposable disposable) {
-					disposable.Dispose ();
+					if (transform is IDisposable disposable) {
+						disposable.Dispose ();
+					}
+					CompiledTemplate?.Dispose ();
+					CompiledTemplate = null;
 				}
-				CompiledTemplate?.Dispose ();
-				CompiledTemplate = null;
-				Host = null;
+				return engineHost.Callback;
 			}
-
-			return errorOutput;
+			throw new NotSupportedException (string.Format(CultureInfo.CurrentCulture, VsTemplatingErrorResources.EngineHostNotSubClassOfProcessEngineHost, host.GetType().Name, typeof(ProcessEngineHost).FullName));
 		}
 
 		static PropertyInfo GetDerivedProperty (Type transformType, string propertyName)

@@ -120,6 +120,9 @@
   <data name="AssemblyLoadError" xml:space="preserve">
     <value>Assembly "{0}" Load Error: {1}</value>
   </data>
+  <data name="EngineHostNotSubClassOfProcessEngineHost" xml:space="preserve">
+    <value>{0} engine host does not derive from {1}.</value>
+  </data>
   <data name="ErrorInitializingTransformationObject" xml:space="preserve">
     <value>Error initializing the transformation object.</value>
   </data>

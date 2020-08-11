@@ -205,7 +205,7 @@ namespace Mono.TextTemplating
 			if (!string.IsNullOrEmpty (settings.Extension)) {
 				host.SetFileExtension (settings.Extension);
 			}
-			if (settings.EncodingName != null) {
+			if (settings.CodePage > 0) {
 				//FIXME: when is this called with false?
 				host.SetOutputEncoding (settings.GetEncoding(), true);
 			}
@@ -459,7 +459,7 @@ namespace Mono.TextTemplating
 					settings.Extension = dt.Extract ("extension");
 					string encoding = dt.Extract ("encoding");
 					if (encoding != null) {
-						settings.EncodingName = encoding;
+						settings.CodePage = Encoding.GetEncoding(encoding).CodePage;
 					}
 					break;
 
@@ -881,14 +881,14 @@ namespace Mono.TextTemplating
 					)));
 				}
 
-				if (settings.EncodingName != null) {
+				if (settings.CodePage > 0) {
 					statements.Add (new CodeExpressionStatement (new CodeMethodInvokeExpression (
 						hostProp,
 						"SetOutputEncoding",
 						new CodeMethodInvokeExpression(
 							new CodeTypeReferenceExpression (typeof(Encoding)),
 							"GetEncoding",
-							new CodePrimitiveExpression (settings.GetEncoding().CodePage),
+							new CodePrimitiveExpression (settings.CodePage),
 							new CodePrimitiveExpression(true)
 						)
 					)));
