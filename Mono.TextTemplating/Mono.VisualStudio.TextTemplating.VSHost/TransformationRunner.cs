@@ -302,6 +302,11 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		{
 			CompiledTemplate compiledTemplate = Factory.Engine.CompileTemplate (pt, content, Host, Settings);
 
+			if (Host is ProcessEngineHost engineHost &&
+				engineHost.Callback.Errors.HasErrors) {
+				Errors.AddRange (engineHost.Callback.Errors);
+			}
+
 			if (Settings.CachedTemplates) {
 				// we will resolve loading of assemblies through the run factory for cached templates
 				compiledTemplate?.Dispose ();
