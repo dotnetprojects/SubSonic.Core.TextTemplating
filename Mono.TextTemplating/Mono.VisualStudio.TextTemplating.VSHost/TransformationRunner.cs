@@ -130,7 +130,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 					CompiledTemplate.SetTextTemplatingEngineHost (Host);
 
-					return CompiledTemplate.Process (transform);
+					return CompiledTemplate.Process (transform).Trim();
 				}
 #else
 				AppDomain.CurrentDomain.AssemblyResolve += ResolveReferencedAssemblies;
