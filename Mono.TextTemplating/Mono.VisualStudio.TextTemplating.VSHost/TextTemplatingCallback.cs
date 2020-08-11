@@ -68,7 +68,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public void ErrorCallback (bool warning, string message, int line, int column)
 		{
-			Errors.Add (new TemplateError (message, new Location (engineHost.TemplateFile, line, column)) {
+			Errors.Add (new TemplateError (message, new Location (engineHost?.TemplateFile, line, column)) {
 				IsWarning = warning
 			});
 		}
