@@ -100,7 +100,8 @@ namespace Mono.TextTemplating
 			return default;
 		}
 	}
-	
+
+	[Serializable]
 	public class CustomDirective
 	{
 		public CustomDirective (string processorName, Directive directive)
