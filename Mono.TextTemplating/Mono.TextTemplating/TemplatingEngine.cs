@@ -365,7 +365,7 @@ namespace Mono.TextTemplating
 						assemblyName = AssemblyName.GetAssemblyName (resolvedAssem).FullName;
 					}
 					resolved [assemblyName] = resolvedAssem;
-				} else {
+				} else if (!resolved.Keys.Any (x => x.StartsWith (resolvedAssem, StringComparison.OrdinalIgnoreCase))) {
 					pt.LogError ("Could not resolve assembly reference '" + assem + "'");
 					return null;
 				}
