@@ -36,6 +36,7 @@ using Mono.VisualStudio.TextTemplating.VSHost;
 
 namespace Mono.TextTemplating
 {
+	[Serializable]
 	public class TemplateGenerator :
 #if FEATURE_APPDOMAINS
 		MarshalByRefObject,
@@ -81,7 +82,12 @@ namespace Mono.TextTemplating
 			Refs.Add (typeof (StringReader).Assembly.Location);
 			Imports.Add ("System");
 		}
-		
+
+		protected TemplateGenerator (SerializationInfo serializationInfo, StreamingContext streamingContext)
+		{
+			throw new NotImplementedException ();
+		}
+
 		public CompiledTemplate CompileTemplate (string content)
 		{
 			if (string.IsNullOrEmpty (content))
