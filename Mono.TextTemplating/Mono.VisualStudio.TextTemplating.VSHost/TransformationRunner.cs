@@ -38,11 +38,12 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 	public abstract class TransformationRunner
 		: IProcessTransformationRunner
 	{
+		private volatile CompiledTemplate compiledTemplate;
 		
 		public TransformationRunFactory Factory { get; private set; }
 		public Guid RunnerId { get; private set; }
 
-		protected CompiledTemplate CompiledTemplate { get; private set; }
+		protected CompiledTemplate CompiledTemplate { get => compiledTemplate; set => compiledTemplate = value; }
 		protected TemplateSettings Settings { get; private set; }
 		protected ITextTemplatingEngineHost Host { get; private set; }
 
@@ -70,6 +71,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			if (assemblyName == null) {
 				throw new ArgumentNullException (nameof (assemblyName));
 			}
+
+
 
 			foreach (string assemblyPath in CompiledTemplate.AssemblyFiles) {
 				if (assemblyName.Name == System.IO.Path.GetFileNameWithoutExtension (assemblyPath)) {

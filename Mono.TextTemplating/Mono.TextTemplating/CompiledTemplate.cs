@@ -96,10 +96,8 @@ namespace Mono.TextTemplating
 
 				success = true;
 			}
-			catch (Exception ex) {
-				if (TemplatingEngine.IsCriticalException (ex)) {
-					throw;
-				}
+			catch (Exception) {
+				throw;
 			}
 			return success;
 		}
