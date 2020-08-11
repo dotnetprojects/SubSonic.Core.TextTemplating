@@ -231,13 +231,13 @@ namespace Mono.TextTemplating
 				var type = typeof(CompiledTemplate);
 				var obj = domain.CreateInstanceFromAndUnwrap (type.Assembly.Location,
 					type.FullName,
-					new object[] { host, results, templateClassFullName, settings.Culture, references.ToArray () });
+					new object[] { host, results, templateClassFullName, settings.GetCultureInfo (), references.ToArray () });
 				
 				return (CompiledTemplate)obj;
 			}
 #endif
 
-			return new CompiledTemplate (results, settings.GetFullName (), host, settings.Culture, references.ToArray ());
+			return new CompiledTemplate (results, settings.GetFullName (), host, settings.GetCultureInfo(), references.ToArray ());
 		}
 
 #if FEATURE_ROSLYN
@@ -403,10 +403,14 @@ namespace Mono.TextTemplating
 					val = dt.Extract ("culture");
 					if (val != null) {
 						var culture = System.Globalization.CultureInfo.GetCultureInfo (val);
-						if (culture == null)
-							pt.LogWarning ("Could not find culture '" + val + "'", dt.StartLocation);
-						else
-							settings.Culture = culture;
+							if (culture == null)
+							{
+								pt.LogWarning("Could not find culture '" + val + "'", dt.StartLocation);
+							}
+							else
+							{
+								settings.CultureId = culture.LCID;
+							}
 					}
 					val = dt.Extract ("hostspecific");
 					if (val != null) {

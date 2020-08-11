@@ -33,6 +33,7 @@ using System.Reflection;
 using System.Threading;
 using System.CodeDom.Compiler;
 using Microsoft.CSharp;
+using System.Globalization;
 #if !NET35
 using Mono.TextTemplating.CodeCompilation;
 #endif
@@ -49,6 +50,7 @@ namespace Mono.TextTemplating
 			CustomDirectives  = new List<CustomDirective> ();
 			DirectiveProcessors = new Dictionary<string, IDirectiveProcessor> ();
 			CodeProviderOptions = new Dictionary<string, string> ();
+			CultureId = CultureInfo.CurrentCulture.LCID;
 		}
 		
 		public bool HostSpecific { get; set; }
@@ -71,7 +73,7 @@ namespace Mono.TextTemplating
 		public string CompilerOptions { get; set; }
 		public string EncodingName { get; set; }
 		public string Extension { get; set; }
-		public System.Globalization.CultureInfo Culture { get; set; }
+		public int CultureId { get; set; }
 		public List<CustomDirective> CustomDirectives { get; private set; }
 		public Dictionary<string,IDirectiveProcessor> DirectiveProcessors { get; private set; }
 		public bool IncludePreprocessingHelpers { get; set; }
@@ -91,6 +93,11 @@ namespace Mono.TextTemplating
 		public Encoding GetEncoding()
 		{
 			return Encoding.GetEncoding (EncodingName);
+		}
+
+		public CultureInfo GetCultureInfo()
+		{
+			return CultureInfo.GetCultureInfo (CultureId);
 		}
 
 		public CodeDomProvider GetCodeDomProvider()
