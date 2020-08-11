@@ -34,6 +34,7 @@ using System.Globalization;
 using System.Reflection;
 using Mono.VisualStudio.TextTemplating;
 using Mono.VisualStudio.TextTemplating.VSHost;
+using System.Linq;
 #if NETSTANDARD
 using System.Runtime.Loader;
 #endif
@@ -134,6 +135,8 @@ namespace Mono.TextTemplating
 			Assembly = Assembly.LoadFile (results.PathToAssembly);
 			// grab the assembly name
 			AssemblyName = Assembly.GetName ();
+
+			AssemblyFiles = AssemblyFiles.Union (new[] { AssemblyName.CodeBase });
 
 			transformType = Assembly.GetType (fullName);
 			//MS Templating Engine does not look on the type itself, 
