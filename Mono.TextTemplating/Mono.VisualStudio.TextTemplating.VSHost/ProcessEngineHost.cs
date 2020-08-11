@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Mono.TextTemplating;
 
@@ -45,14 +46,34 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public ITextTemplatingCallback Callback { get; }
 
-		public IList<string> StandardAssemblyReferences { get; }
+		public virtual IList<string> StandardAssemblyReferences { get; }
 
-		public IList<string> StandardImports { get; }
+		public virtual IList<string> StandardImports { get; }
 
 		public string TemplateFile { get; set; }
 #pragma warning disable CA2227 // Collection properties should be read only
 		public ITextTemplatingSession Session { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
+
+		protected virtual void Initialize ()
+		{
+			if (StandardAssemblyReferences is List<string> references) {
+				references.AddRange (new[]
+				{
+					ResolveAssemblyReference ("System"),
+					ResolveAssemblyReference ("System.Core"),
+					typeof (TemplatingEngine).Assembly.Location
+				}.Distinct());
+			}
+
+			if (StandardImports is List<string> imports) {
+				imports.AddRange (new[]
+				{
+					"System",
+					"Mono.VisualStudio.TextTemplating"
+				}.Distinct ());
+			}
+		}
 
 		public virtual ITextTemplatingSession CreateSession ()
 		{
