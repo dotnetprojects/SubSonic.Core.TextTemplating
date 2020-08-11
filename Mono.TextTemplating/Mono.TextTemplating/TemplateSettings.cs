@@ -69,7 +69,7 @@ namespace Mono.TextTemplating
 		public Dictionary<string, string> CodeProviderOptions { get; private set; }
 		public string Language { get; set; }
 		public string CompilerOptions { get; set; }
-		public Encoding Encoding { get; set; }
+		public string EncodingName { get; set; }
 		public string Extension { get; set; }
 		public System.Globalization.CultureInfo Culture { get; set; }
 		public List<CustomDirective> CustomDirectives { get; private set; }
@@ -86,6 +86,11 @@ namespace Mono.TextTemplating
 		public void SetAssemblies(IEnumerable<string> assemblies)
 		{
 			Assemblies = new HashSet<string> (assemblies);
+		}
+
+		public Encoding GetEncoding()
+		{
+			return Encoding.GetEncoding (EncodingName);
 		}
 
 		public CodeDomProvider GetCodeDomProvider()
