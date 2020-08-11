@@ -136,7 +136,7 @@ namespace Mono.TextTemplating
 			// grab the assembly name
 			AssemblyName = Assembly.GetName ();
 
-			AssemblyFiles = AssemblyFiles.Union (new[] { AssemblyName.CodeBase });
+			AssemblyFiles = AssemblyFiles.Union (new[] { AssemblyName.CodeBase }).ToArray();
 
 			transformType = Assembly.GetType (fullName);
 			//MS Templating Engine does not look on the type itself, 
