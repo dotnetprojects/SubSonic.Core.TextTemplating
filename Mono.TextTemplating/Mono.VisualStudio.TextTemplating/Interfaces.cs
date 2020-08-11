@@ -207,7 +207,6 @@ namespace Mono.VisualStudio.TextTemplating
 	}
 	
 	public interface ITextTemplatingSessionHost
-		: ISerializable
 	{
 		ITextTemplatingSession CreateSession ();
 #pragma warning disable CA2227 // Collection properties should be read only
