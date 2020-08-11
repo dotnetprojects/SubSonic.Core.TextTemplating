@@ -137,7 +137,7 @@ namespace Mono.TextTemplating
 			}
 			finally {
 				if (runner != null) {
-					pt.Errors.AddRange (runner.Errors);
+					pt.Errors.AddRange (runFactory.GetErrors(runner.RunnerId));
 				}
 			}
 
