@@ -90,6 +90,13 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public abstract bool LoadIncludeText (string requestFileName, out string content, out string location);
 
+		public void LogError (string message, Location location, bool isWarning = default)
+		{
+			Errors.Add (new TemplateError (message, location) {
+				IsWarning = isWarning
+			});
+		}
+
 		public void LogErrors (TemplateErrorCollection errors)
 		{
 			Errors.AddRange (errors);

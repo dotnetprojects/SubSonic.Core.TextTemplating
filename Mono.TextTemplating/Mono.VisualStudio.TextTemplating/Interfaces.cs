@@ -188,7 +188,7 @@ namespace Mono.VisualStudio.TextTemplating
 		object GetHostOption (string optionName);
 		bool LoadIncludeText (string requestFileName, out string content, out string location);
 		void LogErrors (TemplateErrorCollection errors);
-//FIXME: this break binary compat
+
 #if FEATURE_APPDOMAINS
 		AppDomain ProvideTemplatingAppDomain (string content);
 #endif
