@@ -34,7 +34,6 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 	public class TextTemplatingCallback
 		: ITextTemplatingCallback
 	{
-		bool isFromOutputDirective;
 		readonly ITextTemplatingEngineHost engineHost;
 
 		public TextTemplatingCallback()
@@ -53,6 +52,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public string Extension { get; private set; } = null;
 
+		public bool IsFromOutputDirective { get; private set; }
+
 		public int CodePage { get; private set; }
 
 		public string TemplateOutput { get; private set; }
@@ -60,7 +61,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		public void Initialize()
 		{
 			Extension = null;
-			isFromOutputDirective = false;
+			IsFromOutputDirective = false;
 
 			Errors.Clear ();
 		}
@@ -79,9 +80,9 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public void SetOutputEncoding (Encoding encoding, bool fromOutputDirective)
 		{
-			if (!isFromOutputDirective) {
+			if (!IsFromOutputDirective) {
 				if (fromOutputDirective) {
-					isFromOutputDirective = true;
+					IsFromOutputDirective = true;
 					CodePage = encoding?.CodePage ?? throw new ArgumentNullException (nameof (encoding));
 				} else {
 					CodePage = encoding?.CodePage ?? Encoding.UTF8.CodePage;
