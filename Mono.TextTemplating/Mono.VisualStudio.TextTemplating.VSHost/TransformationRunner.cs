@@ -38,7 +38,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 	public abstract class TransformationRunner
 		: IProcessTransformationRunner
 	{
-		private volatile CompiledTemplate compiledTemplate;
+		private static volatile CompiledTemplate compiledTemplate;
 		
 		public TransformationRunFactory Factory { get; private set; }
 		public Guid RunnerId { get; private set; }
