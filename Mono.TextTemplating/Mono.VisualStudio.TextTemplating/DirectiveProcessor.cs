@@ -32,12 +32,13 @@ using Mono.TextTemplating;
 
 namespace Mono.VisualStudio.TextTemplating
 {
+	[Serializable]
 	public abstract class DirectiveProcessor : IDirectiveProcessor
 	{
 		protected ITextTemplatingEngineHost Host { get; private set; }
 		protected TemplateSettings Settings { get; private set; }
 
-		CompilerErrorCollection errors;
+		TemplateErrorCollection errors;
 
 		protected DirectiveProcessor ()
 		{
@@ -49,7 +50,7 @@ namespace Mono.VisualStudio.TextTemplating
 			this.Settings = settings ?? throw new ArgumentNullException (nameof (settings));
 		}
 		
-		public virtual void StartProcessingRun (string templateContents, CompilerErrorCollection errors)
+		public virtual void StartProcessingRun (string templateContents, TemplateErrorCollection errors)
 		{
 			this.errors = errors;
 		}
@@ -68,7 +69,7 @@ namespace Mono.VisualStudio.TextTemplating
 			return null;
 		}
 
-		CompilerErrorCollection IDirectiveProcessor.Errors { get { return errors; } }
+		TemplateErrorCollection IDirectiveProcessor.Errors { get { return errors; } }
 
 		void IDirectiveProcessor.SetProcessingRunIsHostSpecific (bool hostSpecific)
 		{

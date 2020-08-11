@@ -43,7 +43,7 @@ namespace Mono.VisualStudio.TextTemplating
 		readonly List<CodeStatement> postStatements = new List<CodeStatement> ();
 		readonly List<CodeTypeMember> members = new List<CodeTypeMember> ();
 		
-		public override void StartProcessingRun (string templateContents, CompilerErrorCollection errors)
+		public override void StartProcessingRun (string templateContents, TemplateErrorCollection errors)
 		{
 			base.StartProcessingRun (templateContents, errors);
 			postStatements.Clear ();

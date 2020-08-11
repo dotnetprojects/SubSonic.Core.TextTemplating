@@ -642,7 +642,7 @@ namespace Mono.TextTemplating
 		{
 
 			foreach (var processor in settings.DirectiveProcessors.Values) {
-				processor.StartProcessingRun (content, pt.Errors.ToCompilerErrorCollection ());
+				processor.StartProcessingRun (content, pt.Errors);
 			}
 
 			foreach (var dt in settings.CustomDirectives) {

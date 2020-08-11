@@ -217,7 +217,7 @@ namespace Mono.VisualStudio.TextTemplating
 
 	public interface IDirectiveProcessor
 	{
-		CompilerErrorCollection Errors { get; }
+		TemplateErrorCollection Errors { get; }
 		bool RequiresProcessingRunIsHostSpecific { get; }
 
 		void FinishProcessingRun ();
@@ -231,6 +231,6 @@ namespace Mono.VisualStudio.TextTemplating
 		bool IsDirectiveSupported (string directiveName);
 		void ProcessDirective (string directiveName, IDictionary<string, string> arguments);
 		void SetProcessingRunIsHostSpecific (bool hostSpecific);
-		void StartProcessingRun (string templateContents, CompilerErrorCollection errors);
+		void StartProcessingRun (string templateContents, TemplateErrorCollection errors);
 	}
 }

@@ -97,7 +97,7 @@ namespace Mono.VisualStudio.TextTemplating
 			return preInitBuffer.ToString ();
 		}
 		
-		public override void StartProcessingRun (string templateContents, CompilerErrorCollection errors)
+		public override void StartProcessingRun (string templateContents, TemplateErrorCollection errors)
 		{
 			AssertNotProcessing ();
 			isInProcessingRun = true;
