@@ -81,7 +81,7 @@ namespace Mono.TextTemplating
 		public bool UseRelativeLinePragmas { get; set; }
 		public bool NoLinePragmas { get; set; }
 		public bool InternalVisibility { get; set; }
-		public Type HostType { get; set; }
+		public string HostType { get; set; }
 
 		public string GetFullName () => string.IsNullOrEmpty (Namespace) ? Name : Namespace + "." + Name;
 
@@ -93,6 +93,14 @@ namespace Mono.TextTemplating
 		public Encoding GetEncoding()
 		{
 			return Encoding.GetEncoding (EncodingName);
+		}
+
+		public Type GetHostType()
+		{
+			if (!string.IsNullOrEmpty (HostType)) {
+				return Type.GetType (HostType);
+			}
+			return default;
 		}
 
 		public CultureInfo GetCultureInfo()

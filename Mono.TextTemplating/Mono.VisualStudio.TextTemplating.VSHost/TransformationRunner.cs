@@ -208,7 +208,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 								property?.SetValue (result, host, null);
 							}
 							else {
-								LogError (string.Format(CultureInfo.CurrentCulture, VsTemplatingErrorResources.HostPropertyNotFound, settings.HostType.Name), false);
+								LogError (string.Format(CultureInfo.CurrentCulture, VsTemplatingErrorResources.HostPropertyNotFound, settings.GetHostType().Name), false);
 							}	
 						}
 						catch(Exception hostException) {

@@ -482,14 +482,14 @@ namespace Mono.TextTemplating
 			}
 
 			if (host is TemplateGenerator gen) {
-				settings.HostType = gen.SpecificHostType;
+				settings.HostType = gen.SpecificHostType?.AssemblyQualifiedName;
 				foreach (var processor in gen.GetAdditionalDirectiveProcessors ()) {
 					settings.DirectiveProcessors [processor.GetType ().FullName] = processor;
 				}
 			}
 
 			if (settings.HostType != null) {
-				settings.Assemblies.Add (settings.HostType.Assembly.Location);
+				settings.Assemblies.Add (settings.GetHostType().Assembly.Location);
 			}
 
 			//initialize the custom processors
@@ -817,7 +817,7 @@ namespace Mono.TextTemplating
 
 			//generate the Host property if needed
 			if (settings.HostSpecific && !settings.HostPropertyOnBase) {
-				GenerateHostProperty (type, settings.HostType);
+				GenerateHostProperty (type, settings.GetHostType());
 			}
 
 			GenerateInitializationMethod (type, settings);
