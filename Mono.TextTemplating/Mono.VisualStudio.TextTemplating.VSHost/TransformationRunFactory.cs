@@ -75,10 +75,21 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public virtual bool PrepareTransformation (Guid runnerId, ParsedTemplate pt, string content, ITextTemplatingEngineHost host, TemplateSettings settings)
 		{
+			if (pt == null) {
+				throw new ArgumentNullException (nameof (pt));
+			}
 #if !NET35
 			if (Runners.TryGetValue(runnerId, out IProcessTransformationRunner _runner) &&
 				_runner is TransformationRunner runner) {
-				return runner.PrepareTransformation (pt, content, host, settings);
+
+				if (!runner.PrepareTransformation(pt, content, host, settings))
+                {
+					runner.Errors.AddRange (pt.Errors);
+
+					return false;
+                }
+
+				return true;
 			}
 			return default;
 #else
