@@ -46,6 +46,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public ITextTemplatingCallback Callback { get; }
 
+		public TemplateErrorCollection Errors => Callback.Errors;
+
 		public virtual IList<string> StandardAssemblyReferences { get; }
 
 		public virtual IList<string> StandardImports { get; }
@@ -90,7 +92,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public void LogErrors (TemplateErrorCollection errors)
 		{
-			Callback.Errors.AddRange (errors);
+			Errors.AddRange (errors);
 		}
 
 		public abstract string ResolveAssemblyReference (string assemblyReference);

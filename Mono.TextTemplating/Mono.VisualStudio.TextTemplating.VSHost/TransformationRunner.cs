@@ -303,8 +303,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			CompiledTemplate compiledTemplate = Factory.Engine.CompileTemplate (pt, content, Host, Settings);
 
 			if (Host is ProcessEngineHost engineHost &&
-				engineHost.Callback.Errors.HasErrors) {
-				Errors.AddRange (engineHost.Callback.Errors);
+				engineHost.Errors.HasErrors) {
+				Errors.AddRange (engineHost.Errors);
 			}
 
 			if (Settings.CachedTemplates) {
