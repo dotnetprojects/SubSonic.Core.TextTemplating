@@ -38,14 +38,17 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 	public abstract class TransformationRunner
 		: IProcessTransformationRunner
 	{
-		private static volatile CompiledTemplate compiledTemplate;
-		
+		[ThreadStatic]
+		static CompiledTemplate compiledTemplate;
+		[ThreadStatic]
+		static ITextTemplatingEngineHost host;
+
 		public TransformationRunFactory Factory { get; private set; }
 		public Guid RunnerId { get; private set; }
 
-		protected CompiledTemplate CompiledTemplate { get => compiledTemplate; set => compiledTemplate = value; }
+		protected static CompiledTemplate CompiledTemplate { get => compiledTemplate; set => compiledTemplate = value; }
 		protected TemplateSettings Settings { get; private set; }
-		protected ITextTemplatingEngineHost Host { get; private set; }
+		protected static ITextTemplatingEngineHost Host { get => host; private set => host = value; }
 
 		public TemplateErrorCollection Errors { get; private set; }
 
@@ -62,7 +65,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		protected abstract void Unload ();
 
-		protected Assembly ResolveReferencedAssemblies (AssemblyLoadContext context, AssemblyName assemblyName)
+		protected static Assembly ResolveReferencedAssemblies (AssemblyLoadContext context, AssemblyName assemblyName)
 		{
 			if (context == null) {
 				throw new ArgumentNullException (nameof (context));
