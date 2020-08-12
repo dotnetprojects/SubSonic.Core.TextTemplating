@@ -52,7 +52,17 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 
 		public virtual IList<string> StandardImports { get; }
 
-		public string TemplateFile { get; set; }
+		string templateFile;
+
+		public string TemplateFile { get => templateFile;
+			set {
+				templateFile = value;
+
+				if (Session != null) {
+					Session[nameof (TemplateFile)] = value;
+				}
+			}
+		}
 #pragma warning disable CA2227 // Collection properties should be read only
 		public ITextTemplatingSession Session { get; set; }
 #pragma warning restore CA2227 // Collection properties should be read only
