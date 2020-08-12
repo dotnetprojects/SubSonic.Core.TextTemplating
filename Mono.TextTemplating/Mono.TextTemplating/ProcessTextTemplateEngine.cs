@@ -55,17 +55,20 @@ namespace Mono.TextTemplating
 				}
 			}
 
+			IProcessTransformationRunner runner = null;
+
 			ParsedTemplate pt = ParsedTemplate.FromText (content, host);
 
-			IProcessTransformationRunner runner = null;
+			TemplateSettings settings = GetSettings (host, pt);
+
+			settings.Debug = debugging;
+
+			EnsureParameterValuesExist (settings, host, pt);
 
 			try {
 				if (pt.Errors.HasErrors) {
 					return null;
 				}
-				TemplateSettings settings = GetSettings (host, pt);
-
-				settings.Debug = debugging;
 
 				runner = CompileAndPrepareRunner (pt, content, host, runFactory, settings);
 			}
@@ -80,6 +83,20 @@ namespace Mono.TextTemplating
 			}
 
 			return runner;
+		}
+
+		static void EnsureParameterValuesExist (TemplateSettings settings, ITextTemplatingEngineHost host, ParsedTemplate pt)
+		{
+			foreach(var directive in settings.CustomDirectives) {
+				if (directive.ProcessorName == nameof(ParameterDirectiveProcessor)) {
+					if (directive.Directive.Attributes.TryGetValue ("name", out string parameterName)) {
+						if (!string.IsNullOrEmpty (host.ResolveParameterValue (directive.Directive.Name, directive.ProcessorName, parameterName))) {
+							continue;
+						}
+					}
+					pt.LogError (string.Format (CultureInfo.CurrentCulture, VsTemplatingErrorResources.CouldNotVerifyParameterValue, parameterName));
+				}
+			}
 		}
 
 		protected virtual IProcessTransformationRunner CompileAndPrepareRunner (ParsedTemplate pt, string content, ITextTemplatingEngineHost host, IProcessTransformationRunFactory runFactory, TemplateSettings settings)

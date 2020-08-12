@@ -70,6 +70,15 @@ namespace Mono.TextTemplating {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not verify the value for the parameter: {0}.
+        /// </summary>
+        internal static string CouldNotVerifyParameterValue {
+            get {
+                return ResourceManager.GetString("CouldNotVerifyParameterValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} engine host does not derive from {1}..
         /// </summary>
         internal static string EngineHostNotSubClassOfProcessEngineHost {

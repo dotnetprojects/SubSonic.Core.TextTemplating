@@ -616,7 +616,7 @@ namespace Mono.TextTemplating
 			IDirectiveProcessor processor;
 
 			switch (processorName) {
-			case "ParameterDirectiveProcessor":
+			case nameof(ParameterDirectiveProcessor):
 				processor = new ParameterDirectiveProcessor ();
 				break;
 			default:
