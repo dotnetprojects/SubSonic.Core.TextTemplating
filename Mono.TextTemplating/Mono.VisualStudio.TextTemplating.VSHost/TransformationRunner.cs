@@ -77,8 +77,6 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 				throw new ArgumentNullException (nameof (assemblyName));
 			}
 
-
-
 			foreach (string assemblyPath in CompiledTemplate.AssemblyFiles) {
 				if (assemblyName.Name == System.IO.Path.GetFileNameWithoutExtension (assemblyPath)) {
 					return context.LoadFromAssemblyPath (assemblyPath);

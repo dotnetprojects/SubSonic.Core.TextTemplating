@@ -49,7 +49,7 @@ namespace Mono.TextTemplating
 		IDisposable
 	{
 		Type transformType;
-		object textTransformation;
+		internal object textTransformation;
 		readonly CultureInfo culture;
 		ITextTemplatingEngineHost host;
 
