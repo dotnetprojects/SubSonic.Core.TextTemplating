@@ -37,11 +37,13 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 	[Serializable]
 	public abstract class TransformationRunner
 		: IProcessTransformationRunner
+		, IDisposable
 	{
 		[ThreadStatic]
 		static CompiledTemplate compiledTemplate;
 		[ThreadStatic]
 		static ITextTemplatingEngineHost host;
+		bool disposedValue;
 
 		public TransformationRunFactory Factory { get; private set; }
 		public Guid RunnerId { get; private set; }
@@ -157,7 +159,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 				finally {
 
 #if NETSTANDARD
-					Unload ();
+					Dispose (false);
 #else
 					AppDomain.CurrentDomain.AssemblyResolve -= ResolveReferencedAssemblies;
 #endif
@@ -347,6 +349,33 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			Errors.Add (new TemplateError (message, new Location (filename, line, column)) {
 				IsWarning = isWarning
 			});
+		}
+
+		protected virtual void Dispose (bool disposing)
+		{
+			if (!disposedValue) {
+				if (disposing) {
+					// TODO: dispose managed state (managed objects)
+				}
+
+				// TODO: free unmanaged resources (unmanaged objects) and override finalizer
+				// TODO: set large fields to null
+				disposedValue = true;
+			}
+		}
+
+		// // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+		// ~TransformationRunner()
+		// {
+		//     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		//     Dispose(disposing: false);
+		// }
+
+		public void Dispose ()
+		{
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose (disposing: true);
+			GC.SuppressFinalize (this);
 		}
 	}
 }
