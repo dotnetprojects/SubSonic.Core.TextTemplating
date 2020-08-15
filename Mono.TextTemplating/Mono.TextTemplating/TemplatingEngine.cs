@@ -493,13 +493,13 @@ namespace Mono.TextTemplating
 			}
 
 			if (host is TemplateGenerator gen) {
-				settings.HostType = gen.SpecificHostType?.AssemblyQualifiedName;
+				settings.HostTypeName = gen.SpecificHostType?.AssemblyQualifiedName;
 				foreach (var processor in gen.GetAdditionalDirectiveProcessors ()) {
 					settings.DirectiveProcessors [processor.GetType ().FullName] = processor;
 				}
 			}
 
-			if (settings.HostType != null) {
+			if (settings.HostTypeName != null) {
 				settings.Assemblies.Add (settings.GetHostType().Assembly.Location);
 			}
 

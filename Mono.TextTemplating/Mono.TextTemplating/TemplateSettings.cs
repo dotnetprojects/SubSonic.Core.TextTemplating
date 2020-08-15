@@ -29,8 +29,6 @@ using System.Text;
 using System.Collections.Generic;
 using Mono.VisualStudio.TextTemplating;
 using System.IO;
-using System.Reflection;
-using System.Threading;
 using System.CodeDom.Compiler;
 using Microsoft.CSharp;
 using System.Globalization;
@@ -82,13 +80,17 @@ namespace Mono.TextTemplating
 		public bool UseRelativeLinePragmas { get; set; }
 		public bool NoLinePragmas { get; set; }
 		public bool InternalVisibility { get; set; }
-		public string HostType { get; set; }
+		public string HostTypeName { get; set; }
 
 		public string GetFullName () => string.IsNullOrEmpty (Namespace) ? Name : Namespace + "." + Name;
 
 		public void SetAssemblies(IEnumerable<string> assemblies)
 		{
-			Assemblies = new HashSet<string> (assemblies);
+#if NETSTANDARD || NETCOREAPP || NET5
+			Assemblies = new HashSet<string> (assemblies ?? Array.Empty<string>());
+#else
+			Assemblies = new HashSet<string> (assemblies ?? new string[] { });
+#endif
 		}
 
 		public Encoding GetEncoding()
@@ -98,8 +100,8 @@ namespace Mono.TextTemplating
 
 		public Type GetHostType()
 		{
-			if (!string.IsNullOrEmpty (HostType)) {
-				return Type.GetType (HostType);
+			if (!string.IsNullOrEmpty (HostTypeName)) {
+				return Type.GetType (HostTypeName);
 			}
 			return default;
 		}
