@@ -96,7 +96,9 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 #else
 		Assembly ResolveReferencedAssemblies (object sender, ResolveEventArgs args)
 		{
+#pragma warning disable IDE0007 // Use implicit type
 			AssemblyName asmName = new AssemblyName (args.Name);
+#pragma warning restore IDE0007 // Use implicit type
 			foreach (var asmFile in CompiledTemplate.AssemblyFiles) {
 				if (asmName.Name == System.IO.Path.GetFileNameWithoutExtension (asmFile)) {
 					return Assembly.LoadFrom (asmFile);
@@ -133,9 +135,14 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 					if (CompiledTemplate.Load (this)) {
 						transform = CreateTextTransformation (Settings, Host, CompiledTemplate.Assembly);
 
-						CompiledTemplate.SetTextTemplatingEngineHost (Host);
+						if (transform != null) {
+							CompiledTemplate.SetTextTemplatingEngineHost (Host);
 
-						engineHost.SetTemplateOutput (CompiledTemplate.Process (transform)?.Trim () ?? errorOutput);
+							engineHost.SetTemplateOutput (CompiledTemplate.Process (transform)?.Trim () ?? errorOutput);
+						}
+						else {
+							engineHost.SetTemplateOutput (errorOutput);
+						}
 					}
 #else
 					AppDomain.CurrentDomain.AssemblyResolve += ResolveReferencedAssemblies;
@@ -143,9 +150,13 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 					if (CompiledTemplate.Load ()) {
 						transform = CreateTextTransformation (Settings, Host, CompiledTemplate.Assembly);
 
-						CompiledTemplate.SetTextTemplatingEngineHost (Host);
+						if (transform != null) {
+							CompiledTemplate.SetTextTemplatingEngineHost (Host);
 
-						engineHost.SetTemplateOutput (CompiledTemplate.Process (transform).Trim ());
+							engineHost.SetTemplateOutput (CompiledTemplate.Process (transform)?.Trim () ?? errorOutput);
+						} else {
+							engineHost.SetTemplateOutput (errorOutput);
+						}
 					}
 #endif
 				}
