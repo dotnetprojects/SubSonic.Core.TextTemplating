@@ -524,10 +524,24 @@ namespace Mono.TextTemplating
 				}
 			}
 
-			if (settings.Name == null)
-				settings.Name = "GeneratedTextTransformation";
-			if (settings.Namespace == null)
-				settings.Namespace = string.Format (CultureInfo.InvariantCulture, typeof (TextTransformation).Namespace + "{0:x}", new Random ().Next ());
+			if (host.GetHostOption (nameof (TemplateSettings.CachedTemplates)) is bool cachedTemplates) {
+				settings.CachedTemplates = cachedTemplates;
+			}
+
+			if (settings.Name == null) {
+				if (!settings.CachedTemplates) {
+					settings.Name = "GeneratedTextTransformation";
+				} else {
+					settings.Name = $"{Path.GetFileNameWithoutExtension (host.TemplateFile)}TextTransformation";
+				}
+			}
+			if (settings.Namespace == null) {
+				if (!settings.CachedTemplates) {
+					settings.Namespace = string.Format (CultureInfo.InvariantCulture, typeof (TextTransformation).Namespace + "{0:x}", new Random ().Next ());
+				} else {
+					settings.Namespace = typeof (TextTransformation).Namespace;
+				}
+			}
 
 			//resolve the CodeDOM provider
 			if (string.IsNullOrEmpty (settings.Language)) {
@@ -539,16 +553,7 @@ namespace Mono.TextTemplating
 				settings.CodeProviderOptions.Add ("CompilerVersion", "v3.5");
 			}
 
-			//if (settings.Provider == null) {
-			//	pt.LogError ("A provider could not be found for the language '" + settings.Language + "'");
-			//	return settings;
-			//}
-
 			settings.UseRelativeLinePragmas = relativeLinePragmas;
-
-			if (host.GetHostOption (nameof (TemplateSettings.CachedTemplates)) is bool cachedTemplates) {
-				settings.CachedTemplates = cachedTemplates;
-			}
 
 			if (host.GetHostOption (nameof (TemplateSettings.Log)) is TextWriter output) {
 				settings.Log = output;
@@ -559,8 +564,6 @@ namespace Mono.TextTemplating
 				settings.RuntimeKind = runtimeKind;
 			}
 #endif
-
-
 
 			return settings;
 		}
