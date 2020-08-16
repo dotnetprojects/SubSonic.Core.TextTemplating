@@ -111,11 +111,13 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		public bool DisposeOfRunner(Guid runnerId)
 		{
 #if !NET35
-			return Runners.TryRemove (runnerId, out IProcessTransformationRunner runner);
+			bool result = Runners.TryRemove (runnerId, out IProcessTransformationRunner runner);
 
 			if (runner is IDisposable disposable) {
 				disposable.Dispose ();
 			}
+
+			return result;
 #else
 			throw new NotSupportedException ();
 #endif
