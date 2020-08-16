@@ -113,6 +113,10 @@ namespace Mono.TextTemplating
 
 		public CodeDomProvider GetCodeDomProvider()
 		{
+			//if (settings.Provider == null) {
+			//	pt.LogError ("A provider could not be found for the language '" + settings.Language + "'");
+			//	return settings;
+			//}
 #if !NET35
 			if (CodeDomProvider.CreateProvider (Language, CodeProviderOptions) is CodeDomProvider provider) {
 #else
