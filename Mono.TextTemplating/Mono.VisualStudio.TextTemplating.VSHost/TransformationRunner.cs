@@ -85,7 +85,7 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 				}
 			}
 
-			string filePath = host.ResolveAssemblyReference ($"{assemblyName.Name}.dll");
+			string filePath = host.ResolveAssemblyReference (assemblyName.Name);
 
 			if (System.IO.File.Exists (filePath)) {
 				return context.LoadFromAssemblyPath (filePath);
