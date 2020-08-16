@@ -61,7 +61,7 @@ namespace Mono.TextTemplating
 
 			TemplateSettings settings = GetSettings (host, pt);
 
-			settings.Debug = debugging;
+			settings.Debug = debugging || settings.CachedTemplates;
 
 			EnsureParameterValuesExist (settings, host, pt);
 
