@@ -369,6 +369,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 			if (!disposedValue) {
 				if (disposing) {
 					// TODO: dispose managed state (managed objects)
+					compiledTemplate?.Dispose ();
+					compiledTemplate = null;
 				}
 
 				// TODO: free unmanaged resources (unmanaged objects) and override finalizer

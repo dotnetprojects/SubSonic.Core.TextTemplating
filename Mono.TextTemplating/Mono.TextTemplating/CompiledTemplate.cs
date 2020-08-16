@@ -256,6 +256,11 @@ namespace Mono.TextTemplating
 
 		public void Dispose ()
 		{
+			if (textTransformation is IDisposable disposable) {
+				disposable.Dispose ();
+				textTransformation = null;
+			}
+
 			if (host != null) {
 				host = null;
 			}
