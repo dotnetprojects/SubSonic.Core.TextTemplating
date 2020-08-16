@@ -170,7 +170,9 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 				finally {
 
 #if NETSTANDARD
-					Dispose (false);
+					// netcore 3.x can unload an assembly context, but that only happens after the assembly is
+					// no longer in focus, if the compiled template is cached, is it out of focus?
+					Dispose (!Settings.CachedTemplates);
 #else
 					AppDomain.CurrentDomain.AssemblyResolve -= ResolveReferencedAssemblies;
 #endif
