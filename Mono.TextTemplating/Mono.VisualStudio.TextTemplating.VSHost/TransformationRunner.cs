@@ -26,6 +26,7 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
 #if NETSTANDARD
 using System.Runtime.Loader;
@@ -170,9 +171,9 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 				finally {
 
 #if NETSTANDARD
-					// netcore 3.x can unload an assembly context, but that only happens after the assembly is
-					// no longer in focus, if the compiled template is cached, is it out of focus?
-					Dispose (!Settings.CachedTemplates);
+					// we are using discardable load contexts now for isolation.
+					// we make sure to unload the context before out of scope for GC
+					Dispose ();
 #else
 					AppDomain.CurrentDomain.AssemblyResolve -= ResolveReferencedAssemblies;
 #endif
@@ -181,8 +182,6 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 					if (transform is IDisposable disposable) {
 						disposable.Dispose ();
 					}
-					CompiledTemplate?.Dispose ();
-					CompiledTemplate = null;
 				}
 				return engineHost.Callback;
 			}
@@ -298,11 +297,12 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 		CompiledTemplate LocateAssembly (ParsedTemplate pt, string content)
 		{
 			CompiledTemplate compiledTemplate = null;
+			DateTime lastUsed = DateTime.Now;
 
 			if (Settings.CachedTemplates) {
-				compiledTemplate = CompiledTemplateCache.Find (Settings.GetFullName ());
+				compiledTemplate = CompiledTemplateCache.Find (Settings.GetFullName (), out lastUsed);
 			}
-			if (compiledTemplate == null) {
+			if (compiledTemplate == null || File.GetLastWriteTime(Host.TemplateFile) > lastUsed) {
 				compiledTemplate = Compile (pt, content);
 				if (Settings.CachedTemplates && compiledTemplate != null) {
 					CompiledTemplateCache.Insert (Settings.GetFullName (), compiledTemplate);
@@ -320,10 +320,8 @@ namespace Mono.VisualStudio.TextTemplating.VSHost
 				Errors.AddRange (engineHost.Errors);
 			}
 
-			if (Settings.CachedTemplates) {
-				// we will resolve loading of assemblies through the run factory for cached templates
-				compiledTemplate?.Dispose ();
-			}
+			// we will resolve loading of assemblies through the run factory load context
+			compiledTemplate?.Dispose ();
 
 			return compiledTemplate;
 		}

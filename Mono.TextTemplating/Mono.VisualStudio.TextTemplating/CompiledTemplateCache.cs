@@ -35,18 +35,26 @@ namespace Mono.VisualStudio.TextTemplating
 		static readonly Dictionary<string, CompiledTemplateRecord> compiledTemplates = new Dictionary<string, CompiledTemplateRecord> (0x23);
 		static DateTime lastUse;
 
-		public static CompiledTemplate Find(string fullClassName)
+		public static CompiledTemplate Find(string fullClassName, out DateTime lastUsed)
 		{
-			CompiledTemplate compiledTemplate = null;
+			lastUsed = new DateTime ();
+
 			Dictionary<string, CompiledTemplateRecord> compiledTemplates = CompiledTemplateCache.compiledTemplates;
 			lock (compiledTemplates) {
 				lastUse = DateTime.Now;
 				if (CompiledTemplateCache.compiledTemplates.TryGetValue(fullClassName, out CompiledTemplateRecord record)) {
-					compiledTemplate = record.CompiledTemplate;
-					record.LastUse = lastUse;
+					try {
+						lastUsed = record.LastUse;
+
+						return record.CompiledTemplate;
+					}
+					finally {
+						record.LastUse = lastUse;
+					}
 				}
 			}
-			return compiledTemplate;
+
+			return default;
 		}
 
 		public static void Insert (string classFullName, CompiledTemplate compiledTemplate)
