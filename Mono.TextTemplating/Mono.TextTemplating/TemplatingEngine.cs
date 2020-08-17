@@ -355,7 +355,7 @@ namespace Mono.TextTemplating
 			var resolved = new Dictionary<string, string> ();
 
 			foreach (string assembly in settings.Assemblies.Union (host.StandardAssemblyReferences)) {
-				if (resolved.Keys.Any(x => x.StartsWith(assembly, StringComparison.Ordinal))) {
+				if (resolved.Keys.Any(x => x.StartsWith($"{assembly}," , StringComparison.Ordinal))) {
 					continue;	// assembly has already been resolved
 				}
 
