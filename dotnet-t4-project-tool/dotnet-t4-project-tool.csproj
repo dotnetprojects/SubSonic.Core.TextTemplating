@@ -31,9 +31,13 @@ This package can be installed into a project using `DotNetCliToolReference`.
 
 
   <ItemGroup>
-    <ProjectReference Include="..\Mono.TextTemplating\Mono.TextTemplating.csproj" />
     <Compile Include="..\TextTransform\Options.cs" Link="Options.cs" />
     <Compile Include="..\dotnet-t4\*.cs" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.TextTemplating\Mono.TextTemplating.csproj" />
   </ItemGroup>
 
 </Project>

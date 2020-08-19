@@ -40,7 +40,10 @@ This package can be installed as a dotnet global or local tool.
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mono.TextTemplating\Mono.TextTemplating.csproj" />
     <Compile Include="..\TextTransform\Options.cs" Link="Options.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.TextTemplating\Mono.TextTemplating.csproj" />
   </ItemGroup>
 </Project>

@@ -3,7 +3,10 @@
 //  
 // Author:
 //       Mikayla Hutchinson <m.j.hutchinson@gmail.com>
-// 
+//
+// Modified:
+//		Kenneth Carter <kccarter32@gmail.com>
+//
 // Copyright (c) 2009 Novell, Inc. (http://www.novell.com)
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,9 +27,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Resources;
 using System.Runtime.CompilerServices;
 
-[assembly: NeutralResourcesLanguage("en")]
+//[assembly: NeutralResourcesLanguage("en")]
 [assembly: InternalsVisibleTo ("Mono.TextTemplating.Tests,PublicKey=0024000004800000940000000602000000240000525341310004000001000100490b59506a03eb5fc5524722a6526eff804b7880a968a581a0bbb73cd6ab93c7b94a14150cb4ea40f610bebf607cea5e8a93ef25d124983300f4bdfe44859430a20a4ed2ac32cfd3a6f0aa12702df819b7799cc0fcf077eea706a27252d59a8a10e5164c2cdddd6680ca76b02ca244e83c1a8cc44b2691052b93ab30bcc613ad")]
 [assembly: InternalsVisibleTo ("Mono.TextTemplating.Roslyn,PublicKey=0024000004800000940000000602000000240000525341310004000001000100490b59506a03eb5fc5524722a6526eff804b7880a968a581a0bbb73cd6ab93c7b94a14150cb4ea40f610bebf607cea5e8a93ef25d124983300f4bdfe44859430a20a4ed2ac32cfd3a6f0aa12702df819b7799cc0fcf077eea706a27252d59a8a10e5164c2cdddd6680ca76b02ca244e83c1a8cc44b2691052b93ab30bcc613ad")]

@@ -21,14 +21,13 @@
 // THE SOFTWARE.
 
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Mono.VisualStudio.TextTemplating;
 using Mono.Options;
+using Mono.VisualStudio.TextTemplating;
 
 namespace Mono.TextTemplating
 {
