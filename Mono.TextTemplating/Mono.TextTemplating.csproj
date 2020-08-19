@@ -5,7 +5,7 @@
     <AssemblyOriginatorKeyFile>..\TextTemplating.snk</AssemblyOriginatorKeyFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>1591;1573</NoWarn>
-    <PackageId>Mono.TextTemplating</PackageId>
+    <PackageId>SubSonic.Core.TextTemplating</PackageId>
     <Description>
 <![CDATA[Open source implementation of the T4 templating engine
 
@@ -22,6 +22,10 @@ This package allows embedding the T4 engine in an application.
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Authors>Kenneth Carter</Authors>
+    <Company>SubSonic-Core</Company>
+    <RepositoryUrl>https://github.com/SubSonic-Core/SubSonic.Core.TextTemplating</RepositoryUrl>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
