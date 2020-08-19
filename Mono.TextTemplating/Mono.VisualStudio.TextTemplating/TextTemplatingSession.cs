@@ -3,7 +3,10 @@
 //  
 // Author:
 //       Mikayla Hutchinson <m.j.hutchinson@gmail.com>
-// 
+//
+// Modified:
+//		Kenneth Carter <kccarter32@gmail.com>
+//
 // Copyright (c) 2010 Novell, Inc.
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +28,6 @@
 // THE SOFTWARE.
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Runtime.Serialization;
 
 namespace Mono.VisualStudio.TextTemplating

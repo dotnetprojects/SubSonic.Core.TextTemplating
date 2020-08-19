@@ -3,6 +3,9 @@
 //  
 // Author:
 //       Mikayla Hutchinson <m.j.hutchinson@gmail.com>
+//
+// Modified:
+//		Kenneth Carter <kccarter32@gmail.com>
 // 
 // Copyright (c) 2009 Novell, Inc. (http://www.novell.com)
 // 
@@ -25,14 +28,13 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 using Mono.VisualStudio.TextTemplating;
-using System.Runtime.Serialization;
-using Mono.VisualStudio.TextTemplating.VSHost;
 
 namespace Mono.TextTemplating
 {
@@ -515,11 +517,6 @@ namespace Mono.TextTemplating
 		public virtual IEnumerable<IDirectiveProcessor> GetAdditionalDirectiveProcessors ()
 		{
 			yield break;
-		}
-
-		public void GetObjectData (SerializationInfo info, StreamingContext context)
-		{
-			throw new NotImplementedException ();
 		}
 	}
 }

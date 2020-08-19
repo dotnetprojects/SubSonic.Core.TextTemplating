@@ -3,6 +3,9 @@
 //  
 // Author:
 //       Mikayla Hutchinson <m.j.hutchinson@gmail.com>
+//
+// Modified:
+//		Kenneth Carter <kccarter32@gmail.com>
 // 
 // Copyright (c) 2009 Novell, Inc. (http://www.novell.com)
 // 
@@ -25,11 +28,9 @@
 // THE SOFTWARE.
 
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using Mono.VisualStudio.TextTemplating;
-using Mono.VisualStudio.TextTemplating.VSHost;
 
 namespace Mono.TextTemplating
 {

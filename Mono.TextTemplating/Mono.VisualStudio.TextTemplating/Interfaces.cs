@@ -3,7 +3,10 @@
 //  
 // Author:
 //       Mikayla Hutchinson <m.j.hutchinson@gmail.com>
-// 
+//
+// Modified:
+//		Kenneth Carter <kccarter32@gmail.com>
+//
 // Copyright (c) 2009-2010 Novell, Inc. (http://www.novell.com)
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
