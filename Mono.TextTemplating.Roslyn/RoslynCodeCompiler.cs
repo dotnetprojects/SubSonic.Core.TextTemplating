@@ -39,25 +39,40 @@ namespace Mono.TextTemplating
 			var syntaxTrees = new List<SyntaxTree> ();
 			foreach (var sourceFile in arguments.SourceFiles) {
 				using var stream = File.OpenRead (sourceFile);
-				var sourceText = SourceText.From (stream, Encoding.UTF8);
-				syntaxTrees.Add (CSharpSyntaxTree.ParseText (sourceText));
+				var sourceText = SourceText.From (stream, Encoding.UTF8, canBeEmbedded: true);
+				syntaxTrees.Add (CSharpSyntaxTree.ParseText (sourceText, path: sourceFile ));
 			}
+
+			var compilationoptions = new CSharpCompilationOptions (OutputKind.DynamicallyLinkedLibrary);
+			if (arguments.Debug)
+				compilationoptions = compilationoptions.WithOptimizationLevel (OptimizationLevel.Debug);
 
 			var compilation = CSharpCompilation.Create (
 				"GeneratedTextTransformation",
 				syntaxTrees,
 				references,
-				new CSharpCompilationOptions (OutputKind.DynamicallyLinkedLibrary)
+				compilationoptions
 			);
 
 			EmitOptions emitOptions = null;
+			List<EmbeddedText> embeddedTexts = null;
+			string pdbPath = null;
 			if (arguments.Debug) {
-				var embeddedTexts = syntaxTrees.Select (st => EmbeddedText.FromSource (st.FilePath, st.GetText ())).ToList ();
-				emitOptions = new EmitOptions (debugInformationFormat: DebugInformationFormat.Embedded);
+				pdbPath = Path.ChangeExtension(arguments.OutputPath, "pdb");
+				embeddedTexts = syntaxTrees.Where ( st => !string.IsNullOrEmpty(st.FilePath)).Select (st => EmbeddedText.FromSource (st.FilePath, st.GetText ())).ToList ();
+				emitOptions = new EmitOptions (debugInformationFormat: DebugInformationFormat.PortablePdb, pdbFilePath: pdbPath);
 			}
 
+			EmitResult result;
 			using var fs = File.OpenWrite (arguments.OutputPath);
-			EmitResult result = compilation.Emit (fs, options: emitOptions);
+			{
+				if (pdbPath != null) {
+					using var pdb = File.OpenWrite (pdbPath);
+					result = compilation.Emit (fs, pdbStream: pdb, options: emitOptions, embeddedTexts: embeddedTexts);
+				} else {
+					result = compilation.Emit (fs, options: emitOptions, embeddedTexts: embeddedTexts);
+				}
+			}
 
 			if (result.Success) {
 				return new CodeCompilerResult {

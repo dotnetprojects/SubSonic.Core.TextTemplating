@@ -138,6 +138,14 @@ namespace Mono.TextTemplating
 			settings.IsPreprocessed = true;
 			language = settings.Language;
 
+			if (!string.IsNullOrEmpty (settings.Extension)) {
+				host.SetFileExtension (settings.Extension);
+			}
+			if (settings.CodePage > 0) {
+				//FIXME: when is this called with false?
+				host.SetOutputEncoding (settings.GetEncoding (), true);
+			}
+
 			var ccu = GenerateCompileUnit (host, content, pt, settings);
 			references = ProcessReferences (host, pt, settings).ToArray ();
 
@@ -279,7 +287,7 @@ namespace Mono.TextTemplating
 				var result = compiler.CompileFile (args, settings.Log, CancellationToken.None).Result;
 
 				var r = new CompilerResults (new TempFileCollection ());
-				r.TempFiles.AddFile (sourceFilename, false);
+				r.TempFiles.AddFile (sourceFilename, args.Debug);
 
 				if (result.ResponseFile != null) {
 					r.TempFiles.AddFile (result.ResponseFile, false);
@@ -357,7 +365,7 @@ namespace Mono.TextTemplating
 
 			var resolved = new Dictionary<string, string> ();
 
-			foreach (string assembly in settings.Assemblies.Union (host.StandardAssemblyReferences)) {
+			foreach (string assembly in settings.Assemblies.Union (TextTransformation.AddRequiredReferences (host.StandardAssemblyReferences))) {
 				if (resolved.Keys.Any(x => x.StartsWith($"{assembly}," , StringComparison.Ordinal))) {
 					continue;	// assembly has already been resolved
 				}
@@ -374,7 +382,7 @@ namespace Mono.TextTemplating
 
 				referencePath = host.ResolveAssemblyReference (assembly);
 
-				if (Path.IsPathRooted(referencePath) && File.Exists(referencePath)) {
+				if (/*Path.IsPathRooted(referencePath) &&*/ File.Exists(referencePath)) {
 					assemblyName = AssemblyName.GetAssemblyName (referencePath).FullName;
 					resolved[assemblyName] = referencePath;
 					continue;
@@ -470,7 +478,10 @@ namespace Mono.TextTemplating
 					break;
 
 				case "output":
-					settings.Extension = dt.Extract ("extension");
+					var extension = dt.Extract ("extension");
+					if (!string.IsNullOrEmpty(extension) && !extension.StartsWith ("."))
+						extension = "." + extension;
+					settings.Extension = extension;
 					string encoding = dt.Extract ("encoding");
 					if (encoding != null) {
 						settings.CodePage = Encoding.GetEncoding(encoding).CodePage;
@@ -616,6 +627,7 @@ namespace Mono.TextTemplating
 		static void AddDirective (TemplateSettings settings, ITextTemplatingEngineHost host, string processorName, Directive directive)
 		{
 			if (settings.DirectiveProcessors.ContainsKey(processorName)) {
+				settings.CustomDirectives.Add (new CustomDirective (processorName, directive));
 				return;
 			}
 
@@ -721,8 +733,6 @@ namespace Mono.TextTemplating
 				type.BaseTypes.Add (new CodeTypeReference (settings.Inherits));
 			} else if (!settings.IncludePreprocessingHelpers) {
 				type.BaseTypes.Add (TypeRef<TextTransformation> ());
-				// issue #87 because CompilerErrorCollection is referenced by the TextTransformation base class
-				TextTransformation.AddRequiredReferences (host.StandardAssemblyReferences);
 			} else {
 				type.BaseTypes.Add (new CodeTypeReference (settings.Name + "Base"));
 			}
