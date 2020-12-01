@@ -228,9 +228,12 @@ namespace Mono.TextTemplating
  					return path;
  			}
 
-			var assemblyName = new AssemblyName(assemblyReference);
-			if (assemblyName.Version != null)//Load via GAC and return full path
-				return Assembly.Load (assemblyName).Location;
+			try {
+				var assemblyName = new AssemblyName (assemblyReference);
+				if (assemblyName.Version != null)//Load via GAC and return full path
+					return Assembly.Load (assemblyName).Location;
+			}
+			catch (Exception) { }
 
 			if (KnownAssemblies.TryGetValue (assemblyReference, out string mappedAssemblyReference)) {
 				return mappedAssemblyReference;
