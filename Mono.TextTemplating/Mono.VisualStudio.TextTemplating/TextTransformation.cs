@@ -219,7 +219,7 @@ namespace Mono.VisualStudio.TextTemplating
 			Dispose (false);
 		}
 
-		internal static void AddRequiredReferences (IList<string> standardAssemblies)
+		internal static IList<string> AddRequiredReferences (IList<string> standardAssemblies)
 		{
 			if (standardAssemblies == null) {
 				throw new ArgumentNullException (nameof (standardAssemblies));
@@ -228,8 +228,9 @@ namespace Mono.VisualStudio.TextTemplating
 			string codeDom = typeof (CompilerErrorCollection).Assembly.Location;
 
 			if (!standardAssemblies.Any (x => x.Equals (codeDom, StringComparison.CurrentCultureIgnoreCase))) {
-				standardAssemblies.Add (codeDom);
+				return standardAssemblies.Union (new[] { codeDom }).ToList ();
 			}
+			return standardAssemblies;
 		}
 
 		#endregion
