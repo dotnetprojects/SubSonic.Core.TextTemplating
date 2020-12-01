@@ -382,9 +382,20 @@ namespace Mono.TextTemplating
 
 				referencePath = host.ResolveAssemblyReference (assembly);
 
-				if (/*Path.IsPathRooted(referencePath) &&*/ File.Exists(referencePath)) {
+				if (File.Exists(referencePath)) {
 					assemblyName = AssemblyName.GetAssemblyName (referencePath).FullName;
+					if (!Path.IsPathRooted (referencePath))
+						referencePath = Path.GetFullPath (referencePath);
 					resolved[assemblyName] = referencePath;
+					continue;
+				}
+
+				var globalFileRef = Path.Combine (System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory (), referencePath);
+				if (File.Exists (globalFileRef)) {
+					assemblyName = AssemblyName.GetAssemblyName (globalFileRef).FullName;
+					if (!Path.IsPathRooted (globalFileRef))
+						globalFileRef = Path.GetFullPath (globalFileRef);
+					resolved[assemblyName] = globalFileRef;
 					continue;
 				}
 
