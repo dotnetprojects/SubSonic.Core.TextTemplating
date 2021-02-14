@@ -160,10 +160,24 @@ namespace Mono.TextTemplating.CodeCompilation
 			var bestVersion = SemVersion.Zero;
 			foreach (var dir in Directory.EnumerateDirectories (parentFolder)) {
 				var name = Path.GetFileName (dir);
-				if (SemVersion.TryParse (name, out var version) && version.Major >= 0) {
-					if (version > bestVersion && (validate == null || validate (dir))) {
-						bestVersion = version;
-						bestMatch = dir;
+				if (!name.Contains ("-")) {
+					if (SemVersion.TryParse (name, out var version) && version.Major >= 0) {
+						if (version > bestVersion && (validate == null || validate (dir))) {
+							bestVersion = version;
+							bestMatch = dir;
+						}
+					}
+				}
+			}
+			foreach (var dir in Directory.EnumerateDirectories (parentFolder)) {
+				var name = Path.GetFileName (dir);
+				if (name.Contains ("-")) {
+					name = name.Split ('-')[0];
+					if (SemVersion.TryParse (name, out var version) && version.Major >= 0) {
+						if (version > bestVersion && (validate == null || validate (dir))) {
+							bestVersion = version;
+							bestMatch = dir;
+						}
 					}
 				}
 			}

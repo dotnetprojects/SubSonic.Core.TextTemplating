@@ -54,6 +54,7 @@ namespace Mono.TextTemplating
 			}
 			
 			var generator = new TemplateGenerator ();
+			
 			string outputFile = null, inputFile = null;
 			var directives = new List<string> ();
 			var parameters = new List<string> ();
@@ -67,8 +68,11 @@ namespace Mono.TextTemplating
 				{ "P=", "Paths to search for referenced assemblies", s => generator.ReferencePaths.Add (s) },
 				{ "dp=", "Directive processor (name!class!assembly)", s => directives.Add (s) },
 				{ "a=", "Parameters (name=value) or ([processorName!][directiveName!]name!value)", s => parameters.Add (s) },
+#if NET5
+				{ "roslyn", "Use Roslyn", s => generator.UseInProcessCompiler () },
+#endif
 				{ "h|?|help", "Show help", s => ShowHelp (false) },
-		//		{ "k=,", "Session {key},{value} pairs", (s, t) => session.Add (s, t) },
+				//		{ "k=,", "Session {key},{value} pairs", (s, t) => session.Add (s, t) },
 				{ "c=", "Preprocess the template into {0:class}", (s) => preprocess = s },
 			};
 			
