@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net45;net5.0</TargetFrameworks>
+    <TargetFrameworks>net5.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\TextTemplating.snk</AssemblyOriginatorKeyFile>

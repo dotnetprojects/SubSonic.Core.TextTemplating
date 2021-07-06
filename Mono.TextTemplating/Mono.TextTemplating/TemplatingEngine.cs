@@ -495,7 +495,12 @@ namespace Mono.TextTemplating
 					settings.Extension = extension;
 					string encoding = dt.Extract ("encoding");
 					if (encoding != null) {
-						settings.CodePage = Encoding.GetEncoding(encoding).CodePage;
+						System.Text.Encoding.RegisterProvider (System.Text.CodePagesEncodingProvider.Instance);
+						if (int.TryParse (encoding, out var code)) {
+							settings.CodePage = Encoding.GetEncoding (code).CodePage;
+						} else {
+							settings.CodePage = Encoding.GetEncoding (encoding).CodePage;
+						}
 					}
 					break;
 
