@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net5.0</TargetFrameworks>
+    <TargetFrameworks>net5.0-windows</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <OutputType>Exe</OutputType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\TextTemplating.snk</AssemblyOriginatorKeyFile>
@@ -13,7 +15,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <DefineConstants Condition="'$(TargetFramework)'=='net5.0'">$(DefineConstants);NET5</DefineConstants>
+    <DefineConstants Condition="'$(TargetFramework)'=='net5.0-windows'">$(DefineConstants);NET5</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,7 +32,7 @@
     <None Include="$(OutDir)\Mono.TextTemplating.dll" Pack="true" PackagePath="tools\Mono.TextTemplating.dll" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0-windows' ">
     <ProjectReference Include="..\Mono.TextTemplating.Roslyn\Mono.TextTemplating.Roslyn.csproj" />
   </ItemGroup>
 
