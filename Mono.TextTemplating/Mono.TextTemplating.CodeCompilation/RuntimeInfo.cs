@@ -110,14 +110,26 @@ namespace Mono.TextTemplating.CodeCompilation
 			}
 
 			string MakeCscPath (string d) => Path.Combine (d, "Roslyn", "bincore", "csc.dll");
-			var sdkDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "sdk"), d => File.Exists (MakeCscPath (d)));
-			if (sdkDir == null) {
-				return FromError (RuntimeKind.NetCore, "Could not find csc.dll in any .NET Core SDK");
+
+			var version = System.Environment.Version.ToString ();
+
+			var runtimeDir = Path.Combine (dotnetRoot, "shared", "Microsoft.NETCore.App", version);
+			if (!File.Exists (Path.Combine (runtimeDir, "System.Runtime.dll"))) {
+				runtimeDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "shared", "Microsoft.NETCore.App"), d => File.Exists (Path.Combine (d, "System.Runtime.dll")));
+				if (runtimeDir == null) {
+					return FromError (RuntimeKind.NetCore, "Could not find System.Runtime.dll in any .NET shared runtime");
+				}
 			}
 
-			var runtimeDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "shared", "Microsoft.NETCore.App"), d => File.Exists (Path.Combine (d, "System.Runtime.dll")));
-			if (runtimeDir == null) {
-				return FromError (RuntimeKind.NetCore, "Could not find System.Runtime.dll in any .NET shared runtime");
+			var sdkDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "sdk"), d => File.Exists (MakeCscPath (d)), version);
+			if (sdkDir == null)
+				sdkDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "sdk"), d => File.Exists (MakeCscPath (d)), string.Join (".", version.Split ('.').Take (2)));
+			if (sdkDir == null)
+				sdkDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "sdk"), d => File.Exists (MakeCscPath (d)), version.Split ('.')[0]);
+			if (sdkDir == null)
+				sdkDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "sdk"), d => File.Exists (MakeCscPath (d)));
+			if (sdkDir == null) {
+				return FromError (RuntimeKind.NetCore, "Could not find csc.dll in any .NET Core SDK");
 			}
 
 			return new RuntimeInfo (RuntimeKind.NetCore) { RuntimeDir = runtimeDir, CscPath = MakeCscPath (sdkDir) };
@@ -154,29 +166,33 @@ namespace Mono.TextTemplating.CodeCompilation
 			return null;
 		}
 
-		static string FindHighestVersionedDirectory (string parentFolder, Func<string, bool> validate)
+		static string FindHighestVersionedDirectory (string parentFolder, Func<string, bool> validate, string startingWith = null)
 		{
 			string bestMatch = null;
 			var bestVersion = SemVersion.Zero;
 			foreach (var dir in Directory.EnumerateDirectories (parentFolder)) {
 				var name = Path.GetFileName (dir);
-				if (!name.Contains ("-")) {
-					if (SemVersion.TryParse (name, out var version) && version.Major >= 0) {
-						if (version > bestVersion && (validate == null || validate (dir))) {
-							bestVersion = version;
-							bestMatch = dir;
+				if (startingWith == null || name.StartsWith (startingWith)) {
+					if (!name.Contains ("-")) {
+						if (SemVersion.TryParse (name, out var version) && version.Major >= 0) {
+							if (version > bestVersion && (validate == null || validate (dir))) {
+								bestVersion = version;
+								bestMatch = dir;
+							}
 						}
 					}
 				}
 			}
 			foreach (var dir in Directory.EnumerateDirectories (parentFolder)) {
 				var name = Path.GetFileName (dir);
-				if (name.Contains ("-")) {
-					name = name.Split ('-')[0];
-					if (SemVersion.TryParse (name, out var version) && version.Major >= 0) {
-						if (version > bestVersion && (validate == null || validate (dir))) {
-							bestVersion = version;
-							bestMatch = dir;
+				if (startingWith == null || name.StartsWith (startingWith)) {
+					if (name.Contains ("-")) {
+						name = name.Split ('-')[0];
+						if (SemVersion.TryParse (name, out var version) && version.Major >= 0) {
+							if (version > bestVersion && (validate == null || validate (dir))) {
+								bestVersion = version;
+								bestMatch = dir;
+							}
 						}
 					}
 				}
