@@ -89,11 +89,7 @@ namespace Mono.TextTemplating
 
 		public void SetAssemblies(IEnumerable<string> assemblies)
 		{
-#if NETSTANDARD || NETCOREAPP || NET5
 			Assemblies = new HashSet<string> (assemblies ?? Array.Empty<string>());
-#else
-			Assemblies = new HashSet<string> (assemblies ?? new string[] { });
-#endif
 		}
 
 		public Encoding GetEncoding()

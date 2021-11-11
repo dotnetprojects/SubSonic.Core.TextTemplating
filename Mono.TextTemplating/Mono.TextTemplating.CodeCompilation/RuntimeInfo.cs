@@ -32,14 +32,10 @@ namespace Mono.TextTemplating.CodeCompilation
 {
 	public enum RuntimeKind
 	{
-#if !NET5
 		Default = 0,
 		NetCore,
 		NetFramework,
 		Mono
-#else
-		Net
-#endif
 	}
 
 	class RuntimeInfo
