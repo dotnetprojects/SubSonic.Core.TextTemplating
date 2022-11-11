@@ -21,7 +21,7 @@ namespace Mono.TextTemplating.CodeCompilation
 				return resolved;
 			}
 
-			if (runtime.Kind != RuntimeKind.NetCore) {
+			if (runtime.Kind != RuntimeKind.NetCore && runtime.Kind != RuntimeKind.AspNetCore) {
 				resolved = Path.Combine (runtime.RuntimeDir, "Facades", reference);
 				if (File.Exists (resolved)) {
 					return resolved;
@@ -43,7 +43,7 @@ namespace Mono.TextTemplating.CodeCompilation
 				yield return "mscorlib.dll";
 				yield return "netstandard.dll";
 				
-				if (runtime.Kind == RuntimeKind.NetCore) {
+				if (runtime.Kind == RuntimeKind.NetCore || runtime.Kind == RuntimeKind.AspNetCore) {
 					yield return "System.Runtime.dll";
 					//because we're referencing the impl not the ref asms, we end up
 					//having to ref internals

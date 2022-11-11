@@ -116,7 +116,7 @@ namespace Mono.TextTemplating.CodeCompilation
 				UseShellExecute = false
 			};
 
-			if (runtime.Kind == RuntimeKind.NetCore) {
+			if (runtime.Kind == RuntimeKind.NetCore || runtime.Kind == RuntimeKind.AspNetCore) {
 				psi.Arguments = $"\"{psi.FileName}\" {psi.Arguments}";
 				psi.FileName = Path.GetFullPath (Path.Combine (runtime.RuntimeDir, "..", "..", "..", "dotnet"));
 			}

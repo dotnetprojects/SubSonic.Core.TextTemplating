@@ -34,6 +34,7 @@ namespace Mono.TextTemplating.CodeCompilation
 	{
 		Default = 0,
 		NetCore,
+		AspNetCore,
 		NetFramework,
 		Mono
 	}
@@ -63,6 +64,10 @@ namespace Mono.TextTemplating.CodeCompilation
 			var coreFx = GetDotNetCoreRuntime ();
 			if (coreFx.IsValid && (coreFx.Kind == kind || kind == RuntimeKind.Default)) {
 				return coreFx;
+			}
+			var aspCoreFx = GetAspDotNetCoreRuntime ();
+			if (aspCoreFx.IsValid && (aspCoreFx.Kind == kind || kind == RuntimeKind.Default)) {
+				return aspCoreFx;
 			}
 			return FromError (RuntimeKind.Mono, "Could not find any valid runtime" );
 		}
@@ -129,6 +134,39 @@ namespace Mono.TextTemplating.CodeCompilation
 			}
 
 			return new RuntimeInfo (RuntimeKind.NetCore) { RuntimeDir = runtimeDir, CscPath = MakeCscPath (sdkDir) };
+		}
+
+		public static RuntimeInfo GetAspDotNetCoreRuntime ()
+		{
+			var dotnetRoot = FindDotNetRoot ();
+			if (dotnetRoot == null) {
+				return FromError (RuntimeKind.AspNetCore, "Could not find .NET Core installation");
+			}
+
+			string MakeCscPath (string d) => Path.Combine (d, "Roslyn", "bincore", "csc.dll");
+
+			var version = System.Environment.Version.ToString ();
+
+			var runtimeDir = Path.Combine (dotnetRoot, "shared", "Microsoft.AspNetCore.App", version);
+			if (!File.Exists (Path.Combine (runtimeDir, "System.Runtime.dll"))) {
+				runtimeDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "shared", "Microsoft.AspNetCore.App"), d => File.Exists (Path.Combine (d, "System.Runtime.dll")));
+				if (runtimeDir == null) {
+					return FromError (RuntimeKind.AspNetCore, "Could not find System.Runtime.dll in any .NET shared runtime");
+				}
+			}
+
+			var sdkDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "sdk"), d => File.Exists (MakeCscPath (d)), version);
+			if (sdkDir == null)
+				sdkDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "sdk"), d => File.Exists (MakeCscPath (d)), string.Join (".", version.Split ('.').Take (2)));
+			if (sdkDir == null)
+				sdkDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "sdk"), d => File.Exists (MakeCscPath (d)), version.Split ('.')[0]);
+			if (sdkDir == null)
+				sdkDir = FindHighestVersionedDirectory (Path.Combine (dotnetRoot, "sdk"), d => File.Exists (MakeCscPath (d)));
+			if (sdkDir == null) {
+				return FromError (RuntimeKind.AspNetCore, "Could not find csc.dll in any .NET Core SDK");
+			}
+
+			return new RuntimeInfo (RuntimeKind.AspNetCore) { RuntimeDir = runtimeDir, CscPath = MakeCscPath (sdkDir) };
 		}
 
 		static string FindDotNetRoot ()
