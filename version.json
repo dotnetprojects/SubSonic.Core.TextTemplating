@@ -1,5 +1,5 @@
 {
-  "version": "99.4.0-jogibear9988.{height}",
+  "version": "99.5.0-jogibear9988.{height}",
   "publicReleaseRefSpec": [
     "^refs/tags/v\\d+\\.\\d+$",
     "^refs/tags/v\\d+\\.\\d+\\.\\d+$"
