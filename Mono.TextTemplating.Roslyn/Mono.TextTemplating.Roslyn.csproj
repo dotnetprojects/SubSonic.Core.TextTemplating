@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net7.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\TextTemplating.snk</AssemblyOriginatorKeyFile>
     <PackageId>Mono.TextTemplating.Roslyn</PackageId>
@@ -24,6 +24,9 @@ To enable the in-process C# compiler, use the TemplatingEngine.UseInProcessCompi
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Version>99.6.0</Version>
+    <AssemblyVersion>99.6.0</AssemblyVersion>
+    <FileVersion>99.6.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,9 +44,5 @@ To enable the in-process C# compiler, use the TemplatingEngine.UseInProcessCompi
 
   <ItemGroup>
     <ProjectReference Include="..\Mono.TextTemplating\Mono.TextTemplating.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Nerdbank.GitVersioning" Version="3.2.31" />
   </ItemGroup>
 </Project>
