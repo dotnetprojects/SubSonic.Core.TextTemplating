@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net7.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\TextTemplating.snk</AssemblyOriginatorKeyFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -15,9 +15,7 @@ This package allows embedding the T4 engine in an application.
 * To install in a project as a `DotNetCliToolReference`, use `dotnet-t4-project-tool` instead.]]>
     </Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <DefineConstants Condition="'$(TargetFramework)'!='net35'">$(DefineConstants);FEATURE_ROSLYN</DefineConstants>
-    <DefaultItemExcludes Condition="'$(TargetFramework)'=='net35'">$(DefaultItemExcludes);Mono.TextTemplating.CodeCompilation\**</DefaultItemExcludes>
-    <FrameworkPathOverride Condition="'$(TargetFramework)' == 'net35' AND '$(OS)' == 'Windows_NT'">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
+    <DefineConstants Condition="'$(TargetFramework)'!='net35'">$(DefineConstants);FEATURE_ROSLYN</DefineConstants>    
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -26,6 +24,9 @@ This package allows embedding the T4 engine in an application.
     <RepositoryUrl>https://github.com/SubSonic-Core/SubSonic.Core.TextTemplating</RepositoryUrl>
     <NeutralLanguage>en</NeutralLanguage>
     <AssemblyName>SubSonic.Core.TextTemplating</AssemblyName>
+    <AssemblyVersion>99.6.0</AssemblyVersion>
+    <FileVersion>99.6.0</FileVersion>
+    <Version>99.6.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
