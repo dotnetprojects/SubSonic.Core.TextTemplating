@@ -24,9 +24,9 @@ To enable the in-process C# compiler, use the TemplatingEngine.UseInProcessCompi
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>99.6.0</Version>
-    <AssemblyVersion>99.6.0</AssemblyVersion>
-    <FileVersion>99.6.0</FileVersion>
+    <Version>99.7.0</Version>
+    <AssemblyVersion>99.7.0</AssemblyVersion>
+    <FileVersion>99.7.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

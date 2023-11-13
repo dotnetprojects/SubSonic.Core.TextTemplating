@@ -24,9 +24,9 @@ This package allows embedding the T4 engine in an application.
     <RepositoryUrl>https://github.com/SubSonic-Core/SubSonic.Core.TextTemplating</RepositoryUrl>
     <NeutralLanguage>en</NeutralLanguage>
     <AssemblyName>SubSonic.Core.TextTemplating</AssemblyName>
-    <AssemblyVersion>99.6.0</AssemblyVersion>
-    <FileVersion>99.6.0</FileVersion>
-    <Version>99.6.0</Version>
+    <AssemblyVersion>99.7.0</AssemblyVersion>
+    <FileVersion>99.7.0</FileVersion>
+    <Version>99.7.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
