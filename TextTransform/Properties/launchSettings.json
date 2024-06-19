@@ -3,7 +3,7 @@
     "TextTransform": {
       "commandName": "Project",
       "commandLineArgs": "--roslyn GenerateTypescriptTypes.tt",
-      "workingDirectory": "C:\\mcc\\HTML\\src\\api"
+      "workingDirectory": "D:\\repos\\mlog\\mcc\\HTML\\src\\api"
     }
   }
 }
