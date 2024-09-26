@@ -24,9 +24,9 @@ To enable the in-process C# compiler, use the TemplatingEngine.UseInProcessCompi
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>99.10.0</Version>
-    <AssemblyVersion>99.8.1</AssemblyVersion>
-    <FileVersion>99.8.1</FileVersion>
+    <Version>99.11.0</Version>
+    <AssemblyVersion>99.11.0</AssemblyVersion>
+    <FileVersion>99.11.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,7 +39,7 @@ To enable the in-process C# compiler, use the TemplatingEngine.UseInProcessCompi
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
   </ItemGroup>
 
   <ItemGroup>
