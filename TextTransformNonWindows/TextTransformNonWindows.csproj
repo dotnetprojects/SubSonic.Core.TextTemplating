@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+    <OutputType>Exe</OutputType>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\TextTemplating.snk</AssemblyOriginatorKeyFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>1591;1573</NoWarn>
+    <LangVersion>7.1</LangVersion>
+    <PackageId>Mono.TextTemplating.Console</PackageId>
+    <IsTool>True</IsTool>
+    <Description>Command-line T4 text transform tool.</Description>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\TextTransform\Options.cs" Link="Options.cs" />
+    <Compile Include="..\TextTransform\TextTransform.cs" Link="TextTransform.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- work around nuget pack targets not packaging private assets from project references -->
+    <ProjectReference Include="..\Mono.TextTemplating\Mono.TextTemplating.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Mono.TextTemplating.Roslyn\Mono.TextTemplating.Roslyn.csproj" />
+    <None Include="$(OutDir)\Mono.TextTemplating.dll" Pack="true" PackagePath="tools\Mono.TextTemplating.dll" />
+  </ItemGroup>
+</Project>

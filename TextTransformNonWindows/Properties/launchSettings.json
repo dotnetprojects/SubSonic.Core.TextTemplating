@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "TextTransform": {
+      "commandName": "Project",
+      "commandLineArgs": "--roslyn GenerateTypescriptTypes.tt",
+      "workingDirectory": "D:\\repos\\mlog\\mcc\\HTML\\src\\api"
+    }
+  }
+}
