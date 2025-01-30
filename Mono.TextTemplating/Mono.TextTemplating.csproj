@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\TextTemplating.snk</AssemblyOriginatorKeyFile>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -24,9 +24,9 @@ This package allows embedding the T4 engine in an application.
     <RepositoryUrl>https://github.com/SubSonic-Core/SubSonic.Core.TextTemplating</RepositoryUrl>
     <NeutralLanguage>en</NeutralLanguage>
     <AssemblyName>SubSonic.Core.TextTemplating</AssemblyName>
-    <AssemblyVersion>99.11.0</AssemblyVersion>
-    <FileVersion>99.11.0</FileVersion>
-    <Version>99.11.0</Version>
+    <AssemblyVersion>99.12.0</AssemblyVersion>
+    <FileVersion>99.12.0</FileVersion>
+    <Version>99.12.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,7 +39,7 @@ This package allows embedding the T4 engine in an application.
 
   <ItemGroup>
     <PackageReference Include="System.CodeDom" Version="4.7.0" Condition="'$(TargetFramework)'=='netstandard2.0'" />
-    <PackageReference Include="System.CodeDom" Version="8.0.0" />
+    <PackageReference Include="System.CodeDom" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
